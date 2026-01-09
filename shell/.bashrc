@@ -13,5 +13,7 @@ alias het='ssh deploy@5.161.58.238'
 
 # Dotfiles management
 alias df='cd ~/dotfiles'
-alias dfc='cd ~/dotfiles && git add . && git commit'
+dfc() {
+  cd ~/dotfiles && git add . && git commit -m "$*"
+}
 export PATH="$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bin:$PATH"
