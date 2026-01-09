@@ -10,4 +10,8 @@ source ~/.local/share/omarchy/default/bash/rc
 # Make an alias for invoking commands you use constantly
 # alias p='python'
 alias het='ssh deploy@5.161.58.238'
+
+# Dotfiles management
+alias df='cd ~/dotfiles'
+alias dfc='cd ~/dotfiles && git add . && git commit'
 export PATH="$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bin:$PATH"
