@@ -1,0 +1,17 @@
+# Sensitive files
+*.log
+*.key
+*.pem
+*_history
+.bash_history
+.zsh_history
+
+# Cache and temporary files
+*.cache
+*.tmp
+*.swp
+*~
+
+# Package manager files that get auto-generated
+lazy-lock.json
+package-lock.json

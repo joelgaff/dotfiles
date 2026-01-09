@@ -1,0 +1,54 @@
+# Application bindings
+$terminal = uwsm app -- $TERMINAL
+$browser = omarchy-launch-browser
+
+bindd = SUPER, RETURN, Terminal, exec, $terminal --dir=$(omarchy-cmd-terminal-cwd)
+bindd = SUPER SHIFT, F, File manager, exec, uwsm app -- nautilus --new-window
+bindd = SUPER SHIFT, B, Browser, exec, $browser
+bindd = SUPER SHIFT ALT, B, Browser (private), exec, $browser --private
+bindd = SUPER SHIFT, M, Music, exec, omarchy-launch-or-focus spotify
+bindd = SUPER SHIFT, N, Editor, exec, omarchy-launch-editor
+bindd = SUPER SHIFT, T, Activity, exec, omarchy-launch-tui btop
+bindd = SUPER SHIFT, D, Docker, exec, omarchy-launch-tui lazydocker
+bindd = SUPER SHIFT, G, Signal, exec, omarchy-launch-or-focus signal "uwsm app -- signal-desktop"
+bindd = SUPER SHIFT, O, Obsidian, exec, omarchy-launch-or-focus obsidian "uwsm app -- obsidian -disable-gpu --enable-wayland-ime"
+bindd = SUPER SHIFT, slash, Passwords, exec, uwsm app -- 1password
+
+# If your web app url contains #, type it as ## to prevent hyperland treat it as comments
+bindd = SUPER SHIFT, A, Claude, exec, omarchy-launch-webapp "https://claude.ai/"
+bindd = SUPER SHIFT ALT, A, Grok, exec, omarchy-launch-webapp "https://grok.com"
+bindd = SUPER SHIFT, C, Calendar, exec, omarchy-launch-webapp "https://app.hey.com/calendar/weeks/"
+bindd = SUPER SHIFT, E, Email, exec, omarchy-launch-webapp "https://app.hey.com"
+bindd = SUPER SHIFT, Y, YouTube, exec, omarchy-launch-webapp "https://youtube.com/"
+bindd = SUPER SHIFT ALT, G, WhatsApp, exec, omarchy-launch-or-focus-webapp WhatsApp "https://web.whatsapp.com/"
+bindd = SUPER SHIFT CTRL, G, Google Messages, exec, omarchy-launch-or-focus-webapp "Google Messages" "https://messages.google.com/web/conversations"
+bindd = SUPER SHIFT, X, X, exec, omarchy-launch-webapp "https://x.com/"
+bindd = SUPER SHIFT ALT, X, X Post, exec, omarchy-launch-webapp "https://x.com/compose/post"
+
+# Joel's customizations
+# bindd = Add bind for escape key 
+
+# Overwrite existing bindings, like putting Omarchy Menu on Super + Space
+# unbind = SUPER SHIFT, SPACE
+# bindd = SUPER SHIFT, SPACE, Omarchy menu, exec, omarchy-menu
+
+# Set SUPER + R to "refresh browser"
+bindd = SUPER, R, Browser Refresh, sendshortcut, Control, R, activewindow
+
+# Set SUPER + T to "new tab"
+unbind = SUPER, T 
+bindd = SUPER, T, Browser New Tab, sendshortcut, Control, T, activewindow
+
+bindd = SUPER, [, Toggle Floating, togglefloating, activewindow
+
+# Set SUPER + Z to "undo" and SUPER SHIFT + Z to "redo".  The "e" on binde means it will repead with keyhold.  Change to bindd to have it happen once per keyhold.
+binde = SUPER, Z, sendshortcut, Control, Z, activewindow
+binde = SUPER SHIFT, Z, sendshortcut, Control SHIFT, Z, activewindow
+
+# Set SUPER + A to "select all"
+bindd = SUPER, A, Select All, sendshortcut, Control, A, activewindow
+
+
+# hyprwhspr - Toggle mode (added by hyprwhspr install auto)
+# Press once to start, press again to stop
+bindd = SUPER ALT, D, Speech-to-text, exec, /usr/lib/hyprwhspr/config/hyprland/hyprwhspr-tray.sh record
