@@ -16,4 +16,5 @@ alias df='cd ~/dotfiles'
 dfc() {
   cd ~/dotfiles && git add . && git commit -m "$*"
 }
+alias dfp='cd ~/dotfiles && git push'
 export PATH="$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bin:$PATH"
