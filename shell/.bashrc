@@ -12,7 +12,18 @@ source ~/.local/share/omarchy/default/bash/rc
 alias het='ssh deploy@5.161.58.238'
 
 # Dotfiles management
-alias df='cd ~/dotfiles'
+df() {
+  if [[ "$1" == "--help" ]]; then
+    echo "Dotfiles commands:"
+    echo "  df          dotfiles - cd into ~/dotfiles"
+    echo "  df --help   show this menu"
+    echo "  dfs         dotfiles status - git status"
+    echo "  dfc <msg>   dotfiles commit - git add all + commit with message"
+    echo "  dfp         dotfiles push - git push"
+  else
+    cd ~/dotfiles
+  fi
+}
 dfc() {
   cd ~/dotfiles && git add . && git commit -m "$*"
 }
