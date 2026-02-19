@@ -4,7 +4,9 @@ My personal configuration files managed with [GNU Stow](https://www.gnu.org/soft
 
 ## Overview
 
-This repository contains configuration files for my Linux setup (Arch Linux with Hyprland). Dotfiles are organized into packages and symlinked to their appropriate locations using GNU Stow.
+This repo tracks user-level config for an [Omarchy](https://omarchy.org) setup (Arch Linux + Hyprland). Omarchy manages the base system — window manager, themes, default apps — but leaves `~/.config/` and `~/.local/bin/` alone. That's where these dotfiles live.
+
+Running `omarchy-update` will never overwrite anything tracked here.
 
 ## Packages
 
@@ -18,33 +20,32 @@ This repository contains configuration files for my Linux setup (Arch Linux with
 - **ghostty** - Ghostty terminal emulator
 - **alacritty** - Alacritty terminal emulator
 - **waybar** - Waybar status bar
+- **walker** - Walker application launcher
+- **bin** - User scripts (`omarchy-export`, `omarchy-import`) in `~/.local/bin`
 
-## Installation
+## How It Works
 
-### Prerequisites
+GNU Stow creates symlinks from this repo into your home directory. The files live here; the symlinks make them appear where apps expect them:
 
-```bash
-sudo pacman -S stow git
-```
+- `dotfiles/shell/.bashrc` → `~/.bashrc`
+- `dotfiles/walker/.config/walker/config.toml` → `~/.config/walker/config.toml`
+- `dotfiles/bin/.local/bin/` → `~/.local/bin/`
 
-### Setup on a New Machine
+When you edit a config file at its normal path (e.g. `~/.config/walker/config.toml`), you're actually editing the file in this repo. Changes can be committed immediately.
 
-1. Clone this repository:
+The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, which is on your PATH via `.bashrc`. Use `omarchy-export` to snapshot your current setup, and `omarchy-import` to restore it on a fresh machine.
+
+## Fresh Machine Setup
+
+1. Install Omarchy, then clone this repo:
    ```bash
    git clone git@github.com:joelgaff/dotfiles.git ~/dotfiles
    cd ~/dotfiles
    ```
 
-2. Stow the packages you want (or all of them):
+2. Stow all packages:
    ```bash
-   # Stow all packages
    stow */
-
-   # Or stow individual packages
-   stow shell
-   stow hypr
-   stow nvim
-   # ... etc
    ```
 
 3. Reload your shell:
@@ -52,20 +53,9 @@ sudo pacman -S stow git
    source ~/.bashrc
    ```
 
-## How It Works
+4. Run `omarchy-import` to restore any additional settings from a previous export.
 
-GNU Stow creates symlinks from this repository to your home directory. For example:
-- `~/dotfiles/shell/.bashrc` → `~/.bashrc`
-- `~/dotfiles/hypr/.config/hypr/` → `~/.config/hypr/`
-- `~/dotfiles/nvim/.config/nvim/` → `~/.config/nvim/`
-
-This means when you edit your config files normally (like `~/.bashrc`), you're actually editing the files in this repository. Any changes can be immediately committed and pushed.
-
-## Usage
-
-### Updating Dotfiles
-
-I've set up some convenient bash functions/aliases for managing this repo:
+## Managing Dotfiles
 
 ```bash
 # Jump to dotfiles directory
@@ -76,37 +66,27 @@ dfc Update hypr keybindings
 
 # Push to GitHub
 dfp
-
-# Or chain them together
-dfc Update configs && dfp
 ```
 
-### Adding New Packages
+### Adding a New Package
 
-1. Create a new package directory with the proper structure:
+1. Create the package with mirrored directory structure:
    ```bash
-   cd ~/dotfiles
-   mkdir -p newpackage/.config/newapp
+   mkdir -p ~/dotfiles/newpackage/.config/newapp
    ```
 
-2. Copy your config files into the package:
+2. Move your config into it:
    ```bash
-   cp -r ~/.config/newapp/* newpackage/.config/newapp/
+   mv ~/.config/newapp/config.toml ~/dotfiles/newpackage/.config/newapp/
    ```
 
-3. Remove the original and stow the package:
+3. Stow it:
    ```bash
-   rm -rf ~/.config/newapp
    stow newpackage
    ```
 
 ### Removing a Package
 
 ```bash
-cd ~/dotfiles
 stow -D packagename
 ```
-
-## Credits
-
-Setup inspired by [Typecraft's dotfiles tutorial](https://typecraft.dev/tutorial/never-lose-your-configs-again).
