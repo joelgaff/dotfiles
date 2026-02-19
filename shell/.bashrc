@@ -12,21 +12,21 @@ source ~/.local/share/omarchy/default/bash/rc
 alias het='ssh deploy@5.161.58.238'
 
 # Dotfiles management
-df() {
+dots() {
   if [[ "$1" == "--help" ]]; then
     echo "Dotfiles commands:"
-    echo "  df          dotfiles - cd into ~/dotfiles"
-    echo "  df --help   show this menu"
-    echo "  dfs         dotfiles status - git status"
-    echo "  dfc <msg>   dotfiles commit - git add all + commit with message"
-    echo "  dfp         dotfiles push - git push"
+    echo "  dots          dotfiles - cd into ~/dotfiles"
+    echo "  dots --help   show this menu"
+    echo "  dotss         dotfiles status - git status"
+    echo "  dotsc <msg>   dotfiles commit - git add all + commit with message"
+    echo "  dotsp         dotfiles push - git push"
   else
     cd ~/dotfiles
   fi
 }
-dfc() {
+dotsc() {
   cd ~/dotfiles && git add . && git commit -m "$*"
 }
-alias dfs='git -C ~/dotfiles status'
-alias dfp='cd ~/dotfiles && git push'
+alias dotss='git -C ~/dotfiles status'
+alias dotsp='cd ~/dotfiles && git push'
 export PATH="$HOME/.local/bin:$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bin:$PATH"
