@@ -21,7 +21,7 @@ Running `omarchy-update` will never overwrite anything tracked here.
 - **alacritty** - Alacritty terminal emulator
 - **waybar** - Waybar status bar
 - **walker** - Walker application launcher
-- **bin** - User scripts (`omarchy-export`, `omarchy-import`) in `~/.local/bin`
+- **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
 
 ## How It Works
 
@@ -66,6 +66,18 @@ dfc Update hypr keybindings
 
 # Push to GitHub
 dfp
+```
+
+### Saving AUR Packages
+
+Run `dots-save-packages` to save a list of your AUR packages to `aur-packages.txt` in the repo root. This makes it easy to reinstall them on a fresh machine:
+
+```bash
+# Save current AUR packages
+dots-save-packages
+
+# On a new machine, install them with your AUR helper
+yay -S - < ~/dotfiles/aur-packages.txt
 ```
 
 ### Adding a New Package

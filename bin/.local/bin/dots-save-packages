@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Save AUR package list to the dotfiles repo
+# Pulls logic from omarchy-export (pacman -Qqm)
+
+DOTFILES_DIR="$HOME/dotfiles"
+
+pacman -Qqm > "$DOTFILES_DIR/aur-packages.txt" 2>/dev/null
+
+AUR_COUNT=$(wc -l < "$DOTFILES_DIR/aur-packages.txt")
+echo "Saved $AUR_COUNT AUR packages to aur-packages.txt"
