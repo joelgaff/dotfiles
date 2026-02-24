@@ -30,3 +30,4 @@ dotsc() {
 alias dotss='git -C ~/dotfiles status'
 alias dotsp='cd ~/dotfiles && git push'
 export PATH="$HOME/.local/bin:$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bin:$PATH"
+alias lg='lazygit'
