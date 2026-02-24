@@ -1,0 +1,2 @@
+joel ALL=(ALL) NOPASSWD: /usr/bin/systemctl mask fprintd.service, /usr/bin/systemctl unmask fprintd.service, /usr/bin/systemctl stop fprintd.service
+
