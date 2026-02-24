@@ -12,7 +12,7 @@ if [ "$1" = "close" ]; then
         sudo systemctl stop fprintd.service
     fi
 elif [ "$1" = "open" ]; then
-    hyprctl keyword monitor "eDP-1, 2880x1920@120, auto, 2"
+    hyprctl keyword monitor "eDP-1, 2880x1920@120, auto-center-down, 2"
     sleep 0.5
     for i in 1 2 3 4 5; do
         hyprctl dispatch moveworkspacetomonitor "$i eDP-1"
