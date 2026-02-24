@@ -8,6 +8,8 @@ if [ "$1" = "close" ]; then
         for i in 1 2 3 4 5; do
             hyprctl dispatch moveworkspacetomonitor "$i $EXTERNAL"
         done
+        sudo systemctl mask fprintd.service
+        sudo systemctl stop fprintd.service
     fi
 elif [ "$1" = "open" ]; then
     hyprctl keyword monitor "eDP-1, 2880x1920@120, auto, 2"
@@ -15,4 +17,5 @@ elif [ "$1" = "open" ]; then
     for i in 1 2 3 4 5; do
         hyprctl dispatch moveworkspacetomonitor "$i eDP-1"
     done
+    sudo systemctl unmask fprintd.service
 fi
