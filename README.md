@@ -22,6 +22,7 @@ Running `omarchy-update` will never overwrite anything tracked here.
 - **waybar** - Waybar status bar
 - **walker** - Walker application launcher
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
+- **systemd** - System-level config files (not managed by Stow — see [System Configuration](#system-configuration))
 
 ## How It Works
 
@@ -78,6 +79,14 @@ dots-save-packages
 
 # On a new machine, install them with your AUR helper
 yay -S - < ~/dotfiles/aur-packages.txt
+```
+
+### System Configuration
+
+The `systemd/` directory contains system-level config files that live in `/etc/` and can't be managed by Stow. These are tracked here for version control and deployed manually:
+
+```bash
+sudo cp -r ~/dotfiles/systemd/etc/ /etc/
 ```
 
 ### Adding a New Package
