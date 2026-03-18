@@ -10,6 +10,11 @@ if [ "$1" = "close" ]; then
         done
         sudo systemctl mask fprintd.service
         sudo systemctl stop fprintd.service
+    else
+        # No external monitor — going into a bag. Suspend, then hibernate after 30min.
+        loginctl lock-session
+        sleep 1
+        systemctl suspend-then-hibernate
     fi
 elif [ "$1" = "open" ]; then
     hyprctl keyword monitor "eDP-1, 2880x1920@120, auto-center-down, 2"

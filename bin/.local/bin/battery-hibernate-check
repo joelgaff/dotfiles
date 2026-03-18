@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Hibernate when battery is critically low (≤3%).
+# Called by omarchy-battery-monitor.service via ExecStartPost drop-in.
+
+BAT=$(omarchy-battery-remaining)
+STATE=$(upower -i $(upower -e | grep BAT) | awk '/state:/{print $2}')
+
+if [[ "$STATE" == "discharging" && "$BAT" -le 3 ]] 2>/dev/null; then
+  notify-send -u critical "Battery ${BAT}% — hibernating now"
+  loginctl lock-session
+  sleep 1
+  systemctl hibernate
+fi
