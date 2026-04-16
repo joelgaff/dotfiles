@@ -1,0 +1,39 @@
+# qmd-update.service — Re-index and embed QMD collections
+#
+# QMD is a local search engine for markdown files. This service keeps the
+# index fresh so that searches (via CLI or MCP) return up-to-date results.
+#
+# Two steps run in sequence:
+#   1. `qmd update` — scans collections for new/changed/deleted files and
+#      updates the full-text (BM25) index.
+#   2. `qmd embed`  — generates vector embeddings for any new or changed
+#      documents, enabling semantic (meaning-based) search.
+#
+# Triggered by qmd-update.timer (daily). Can also be run manually:
+#   systemctl --user start qmd-update.service
+#
+# QMD is installed via npm through mise (node version manager), so we set
+# PATH explicitly to include the mise node bin directory.
+
+[Unit]
+Description=Re-index and embed QMD markdown search collections
+# Only run when we have a network target (not strictly needed, but good hygiene)
+After=default.target
+
+[Service]
+Type=oneshot
+
+# mise-managed node — ensures systemd can find the `qmd` binary
+Environment=PATH=/home/joel/.local/share/mise/installs/node/25.2.1/bin:/home/joel/.local/bin:/usr/local/bin:/usr/bin
+
+ExecStart=/bin/bash -c 'qmd update && qmd embed'
+
+# Logging goes to journald: journalctl --user -u qmd-update
+StandardOutput=journal
+StandardError=journal
+
+# Don't retry on failure — the timer will fire again tomorrow
+Restart=no
+
+# Generous timeout since embedding can take a while on CPU
+TimeoutStartSec=600

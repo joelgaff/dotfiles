@@ -22,6 +22,7 @@ Running `omarchy-update` will never overwrite anything tracked here.
 - **waybar** - Waybar status bar
 - **walker** - Walker application launcher
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
+- **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
 - **systemd** - System-level config files (not managed by Stow — see [System Configuration](#system-configuration))
 
 ## How It Works

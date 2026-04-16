@@ -1,0 +1,33 @@
+# qmd-update.timer — Daily trigger for qmd-update.service
+#
+# Runs QMD re-index + embedding once per day, 10 minutes after login.
+# Uses Persistent=true so if the machine was off at the scheduled time,
+# it runs as soon as possible on next login.
+#
+# Check timer status:
+#   systemctl --user status qmd-update.timer
+#   systemctl --user list-timers
+#
+# Run immediately (skip waiting for timer):
+#   systemctl --user start qmd-update.service
+
+[Unit]
+Description=Daily QMD re-index and embedding
+
+[Timer]
+# First run: 10 minutes after login
+OnStartupSec=10min
+
+# Subsequent runs: every 24 hours
+OnUnitActiveSec=24h
+
+# If the machine was off when the timer should have fired, run on next boot
+Persistent=true
+
+# Spread the exact fire time randomly within a 5-minute window to avoid
+# thundering herd if multiple timers fire at once
+RandomizedDelaySec=5min
+
+[Install]
+# Enable with: systemctl --user enable qmd-update.timer
+WantedBy=timers.target
