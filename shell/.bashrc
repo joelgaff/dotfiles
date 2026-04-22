@@ -11,6 +11,7 @@ source ~/.local/share/omarchy/default/bash/rc
 # alias p='python'
 alias het='ssh deploy@5.161.58.238'
 alias t3='things3'
+alias bcc='basecamp'
 
 # Dotfiles management
 dots() {
