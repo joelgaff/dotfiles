@@ -10,6 +10,7 @@ source ~/.local/share/omarchy/default/bash/rc
 # Make an alias for invoking commands you use constantly
 # alias p='python'
 alias het='ssh deploy@5.161.58.238'
+alias t3='things3'
 
 # Dotfiles management
 dots() {
