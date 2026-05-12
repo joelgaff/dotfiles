@@ -1,26 +1,23 @@
 #!/bin/bash
+# Lid-switch handler. Delegates to Omarchy's monitor command and adds:
+#  - fprintd mask/unmask coupled to internal-display state
+#  - undocked fallback: lock + suspend-then-hibernate
 
-if [ "$1" = "close" ]; then
-    EXTERNAL=$(hyprctl monitors -j | grep -o '"name": "DP-[0-9]*"' | head -1 | cut -d'"' -f4)
-    if [ -n "$EXTERNAL" ]; then
-        hyprctl keyword monitor "eDP-1, disable"
-        sleep 0.5
-        for i in 1 2 3 4 5; do
-            hyprctl dispatch moveworkspacetomonitor "$i $EXTERNAL"
-        done
-        sudo systemctl mask fprintd.service
-        sudo systemctl stop fprintd.service
+case "$1" in
+  close)
+    if omarchy-hw-external-monitors; then
+      omarchy-hyprland-monitor-internal off
+      sudo systemctl mask fprintd.service
+      sudo systemctl stop fprintd.service
     else
-        # No external monitor — going into a bag. Suspend, then hibernate after 30min.
-        loginctl lock-session
-        sleep 1
-        systemctl suspend-then-hibernate
+      # No external — going in a bag. Suspend, then hibernate after 30min.
+      loginctl lock-session
+      sleep 1
+      systemctl suspend-then-hibernate
     fi
-elif [ "$1" = "open" ]; then
-    hyprctl keyword monitor "eDP-1, 2880x1920@120, auto-center-down, 2"
-    sleep 0.5
-    for i in 1 2 3 4 5; do
-        hyprctl dispatch moveworkspacetomonitor "$i eDP-1"
-    done
+    ;;
+  open)
+    omarchy-hyprland-monitor-internal on
     sudo systemctl unmask fprintd.service
-fi
+    ;;
+esac
