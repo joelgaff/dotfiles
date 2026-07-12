@@ -37,9 +37,5 @@ alias lg='lazygit'
 # LazyVPN
 export PATH="$HOME/.local/share/lazyvpn/bin:$PATH"
 
-# Show hostname in prompt when connected over SSH
-if [[ -n "$SSH_CONNECTION" ]]; then
-  PS1='\[\e[0;33m\]\h\[\e[0m\] '"$PS1"
-fi
 
 alias gateway='ssh gateway'
