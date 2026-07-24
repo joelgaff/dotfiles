@@ -1,0 +1,27 @@
+# Cross-platform shell aliases and functions.
+# Sourced from .bashrc (Linux) and .zshrc (macOS).
+
+alias het='ssh deploy@5.161.58.238'
+alias gateway='ssh gateway'
+alias t3='things3'
+alias bcc='basecamp'
+alias lg='lazygit'
+
+# Dotfiles management
+dots() {
+  if [[ "$1" == "--help" ]]; then
+    echo "Dotfiles commands:"
+    echo "  dots          dotfiles - cd into ~/dotfiles"
+    echo "  dots --help   show this menu"
+    echo "  dotss         dotfiles status - git status"
+    echo "  dotsc <msg>   dotfiles commit - git add all + commit with message"
+    echo "  dotsp         dotfiles push - git push"
+  else
+    cd ~/dotfiles
+  fi
+}
+dotsc() {
+  cd ~/dotfiles && git add . && git commit -m "$*"
+}
+alias dotss='git -C ~/dotfiles status'
+alias dotsp='cd ~/dotfiles && git push'
