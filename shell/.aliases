@@ -25,3 +25,22 @@ dotsc() {
 }
 alias dotss='git -C ~/dotfiles status'
 alias dotsp='cd ~/dotfiles && git push'
+
+# Report dotfiles push/pull/dirty state. Silent when clean.
+dotcheck() {
+  [ -d ~/dotfiles/.git ] || return
+  ( cd ~/dotfiles && git fetch -q 2>/dev/null
+    local ahead behind dirty
+    ahead=$(git rev-list --count '@{u}..HEAD' 2>/dev/null)
+    behind=$(git rev-list --count 'HEAD..@{u}' 2>/dev/null)
+    dirty=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    [ "${ahead:-0}"  -gt 0 ] && echo "dotfiles: $ahead commit(s) to push"
+    [ "${behind:-0}" -gt 0 ] && echo "dotfiles: $behind commit(s) to pull"
+    [ "${dirty:-0}"  -gt 0 ] && echo "dotfiles: $dirty uncommitted change(s)"
+  )
+}
+
+# Run dotcheck at most once per day on shell startup.
+if [ -z "$(find ~/.dotcheck-stamp -mtime -1 2>/dev/null)" ]; then
+  dotcheck && touch ~/.dotcheck-stamp
+fi
