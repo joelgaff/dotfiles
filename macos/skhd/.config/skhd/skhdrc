@@ -10,3 +10,6 @@ cmd - return : open -a Ghostty
 
 # SUPER + SHIFT + B -> browser; opens Chrome, or focuses it if running
 cmd + shift - b : open -a "Google Chrome"
+
+# SUPER + SHIFT + O -> Obsidian; opens it, or focuses it if running
+cmd + shift - o : open -a "Obsidian"
