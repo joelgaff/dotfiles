@@ -45,10 +45,16 @@ The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, 
    cd ~/dotfiles
    ```
 
-2. Stow all packages:
+2. Stow all cross-platform packages (excludes the `macos/` dir):
    ```bash
-   stow */
+   stow $(ls -d */ | grep -vx 'macos/')
    ```
+
+   On **macOS only**, also stow the Mac-specific packages:
+   ```bash
+   stow -d macos -t ~ skhd
+   ```
+   These live under `macos/` so `stow */` on Linux never picks them up.
 
 3. Reload your shell:
    ```bash

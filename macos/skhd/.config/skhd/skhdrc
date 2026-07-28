@@ -1,0 +1,9 @@
+# skhd — macOS hotkey daemon (mac-only stow package)
+# Mirrors Omarchy's Hyprland app-launch bindings, mapping SUPER -> cmd.
+#
+# Install:  brew tap koekeishiya/formulae && brew install skhd
+# Enable:   stow -d ~/dotfiles/macos -t ~ skhd && skhd --start-service
+# Perms:    grant skhd Accessibility (System Settings > Privacy & Security)
+
+# SUPER + RETURN -> terminal (Omarchy's $terminal; Ghostty on this Mac)
+cmd - return : open -a Ghostty
