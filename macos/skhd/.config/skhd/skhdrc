@@ -7,3 +7,6 @@
 
 # SUPER + RETURN -> terminal (Omarchy's $terminal; Ghostty on this Mac)
 cmd - return : open -a Ghostty
+
+# SUPER + SHIFT + B -> browser; opens Chrome, or focuses it if running
+cmd + shift - b : open -a "Google Chrome"
