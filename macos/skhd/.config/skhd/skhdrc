@@ -16,3 +16,6 @@ cmd + shift - o : open -a "Obsidian"
 
 # SUPER + SHIFT + E -> email; opens Outlook, or focuses it if running
 cmd + shift - e : open -a "Microsoft Outlook"
+
+# SUPER + SHIFT + F -> file manager; opens/focuses Finder
+cmd + shift - f : open -a "Finder"
