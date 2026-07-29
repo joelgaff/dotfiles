@@ -19,3 +19,7 @@ cmd + shift - e : open -a "Microsoft Outlook"
 
 # SUPER + SHIFT + F -> file manager; opens/focuses Finder
 cmd + shift - f : open -a "Finder"
+
+# SUPER + SHIFT + T -> Microsoft Teams; opens it, or focuses it if running
+# note: shadows "reopen closed tab" in browsers globally
+cmd + shift - t : open -a "Microsoft Teams"
