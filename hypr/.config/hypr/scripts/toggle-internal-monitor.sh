@@ -2,7 +2,7 @@
 # Manually toggle internal display (eDP-1). Delegates to Omarchy's command
 # and adds fprintd state coupling + explicit workspace placement.
 
-TOGGLE_FLAG="$HOME/.local/state/omarchy/toggles/hypr/internal-monitor-disable.conf"
+TOGGLE_FLAG="$HOME/.local/state/omarchy/toggles/hypr/internal-monitor-disable.lua"
 
 if [ -f "$TOGGLE_FLAG" ]; then
   omarchy-hyprland-monitor-internal on
