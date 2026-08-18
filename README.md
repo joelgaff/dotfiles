@@ -16,11 +16,9 @@ Running `omarchy-update` will never overwrite anything tracked here.
 - **git** - Git configuration
 - **starship** - Starship shell prompt
 - **mise** - Mise version manager
-- **kitty** - Kitty terminal emulator
 - **ghostty** - Ghostty terminal emulator
 - **alacritty** - Alacritty terminal emulator
-- **waybar** - Waybar status bar
-- **walker** - Walker application launcher
+- **omarchy** - Omarchy (Quattro) Quickshell settings — bar layout, idle timers
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
 - **systemd** - System-level config files (not managed by Stow — see [System Configuration](#system-configuration))
@@ -30,10 +28,10 @@ Running `omarchy-update` will never overwrite anything tracked here.
 GNU Stow creates symlinks from this repo into your home directory. The files live here; the symlinks make them appear where apps expect them:
 
 - `dotfiles/shell/.bashrc` → `~/.bashrc`
-- `dotfiles/walker/.config/walker/config.toml` → `~/.config/walker/config.toml`
+- `dotfiles/ghostty/.config/ghostty/config` → `~/.config/ghostty/config`
 - `dotfiles/bin/.local/bin/` → `~/.local/bin/`
 
-When you edit a config file at its normal path (e.g. `~/.config/walker/config.toml`), you're actually editing the file in this repo. Changes can be committed immediately.
+When you edit a config file at its normal path (e.g. `~/.config/ghostty/config`), you're actually editing the file in this repo. Changes can be committed immediately.
 
 The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, which is on your PATH via `.bashrc`. Use `omarchy-export` to snapshot your current setup, and `omarchy-import` to restore it on a fresh machine.
 
