@@ -64,9 +64,14 @@
     "transparent": true
   },
   "idle": {
-    "lock": 300,
-    "screensaver": 150
+    "displayOff": 600,
+    "lock": 3600,
+    "screensaver": 7200
   },
-  "plugins": [],
+  "plugins": [
+    {
+      "id": "joel.display-off"
+    }
+  ],
   "version": 1
 }

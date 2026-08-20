@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "joel.display-off",
+  "name": "Display Off",
+  "version": "1.0.0",
+  "author": "Joel",
+  "description": "Powers the displays off after idle.displayOff seconds, without locking the session.",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}
