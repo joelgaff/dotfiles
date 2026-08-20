@@ -6,7 +6,10 @@ My personal configuration files managed with [GNU Stow](https://www.gnu.org/soft
 
 This repo tracks user-level config for an [Omarchy](https://omarchy.org) setup (Arch Linux + Hyprland). Omarchy manages the base system — window manager, themes, default apps — but leaves `~/.config/` and `~/.local/bin/` alone. That's where these dotfiles live.
 
-Running `omarchy-update` will never overwrite anything tracked here.
+`omarchy update` mostly leaves these alone, but not always: its migrations rewrite
+user configs with `jq >tmp && mv tmp config`, and that `mv` replaces a stow symlink
+with a plain file. The config keeps working while this repo quietly stops tracking it.
+A `post-update` hook re-links everything afterwards — see [Config Drift](#config-drift).
 
 ## Packages
 
@@ -18,10 +21,12 @@ Running `omarchy-update` will never overwrite anything tracked here.
 - **mise** - Mise version manager
 - **ghostty** - Ghostty terminal emulator
 - **alacritty** - Alacritty terminal emulator
-- **omarchy** - Omarchy (Quattro) Quickshell settings — bar layout, idle timers
+- **omarchy** - Omarchy (Quattro) Quickshell settings — bar layout, idle timers, the
+  `joel.display-off` shell plugin, and the `post-update` hook that repairs stow drift
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
-- **systemd** - System-level config files (not managed by Stow — see [System Configuration](#system-configuration))
+- **systemd** - System-level config in `/etc/` — logind, sudoers, UPower (not managed by
+  Stow — see [System Configuration](#system-configuration))
 
 ## How It Works
 
@@ -88,10 +93,43 @@ yay -S - < ~/dotfiles/aur-packages.txt
 
 ### System Configuration
 
-The `systemd/` directory contains system-level config files that live in `/etc/` and can't be managed by Stow. These are tracked here for version control and deployed manually:
+The `systemd/` directory contains system-level config that lives in `/etc/` and can't be
+managed by Stow. Despite the name it is not all systemd — it also holds `sudoers.d/` and
+UPower config. These are tracked here for version control and deployed manually:
 
 ```bash
-sudo cp -r ~/dotfiles/systemd/etc/ /etc/
+sudo cp -rT ~/dotfiles/systemd/etc /etc
+```
+
+The `-T` matters. Without it, `cp -r src/ /etc/` copies the *directory* rather than its
+contents and you get an inert `/etc/etc/` instead of the deploy you wanted.
+
+What's in there:
+
+- `systemd/logind.conf.d/lid.conf` — leaves lid handling to Hyprland's `clamshell.sh`
+- `sudoers.d/clamshell` — lets that script run without a password prompt
+- `UPower/UPower.conf.d/90-critical-hibernate.conf` — hibernates at 7% battery so an
+  unattended machine saves its session instead of dying with it. `upowerd` already polls
+  the battery for everything else, so nothing custom monitors it.
+
+After changing the UPower drop-in, `sudo systemctl restart upower`.
+
+### Config Drift
+
+Omarchy migrations replace stowed files with plain copies (see
+[Overview](#overview)), which silently unlinks them from this repo. `shell.json` drifted
+that way once and lost a lock-timeout change before anyone noticed.
+
+`omarchy/.config/omarchy/hooks/post-update.d/restow-dotfiles` runs after every
+`omarchy update`. It re-stows every package with `--adopt`: anything still linked is left
+alone, anything that came unlinked has its live content pulled back into this repo and its
+symlink restored. If it adopted anything, it sends a notification — review with
+`cd ~/dotfiles && git diff` before committing.
+
+To check by hand at any time:
+
+```bash
+cd ~/dotfiles && stow --adopt $(ls -d */ | grep -vx 'macos/') && git status
 ```
 
 ### Adding a New Package
