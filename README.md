@@ -68,15 +68,28 @@ The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, 
 
 ## Managing Dotfiles
 
+Defined in `shell/.aliases`, which both `.bashrc` and `.zshrc` source:
+
 ```bash
-# Jump to dotfiles directory
-df
+dots                    # cd into ~/dotfiles
+dots --help             # list these commands
+dotss                   # git status
+dotsc "Update hypr"     # git add -A + commit
+dotsc                   # same, but suggests a message from the diff
+dotsp                   # git push
+```
 
-# Commit changes with a message
-dfc Update hypr keybindings
+`dotcheck` reports uncommitted, unpushed, or unpulled work with a fix hint for
+each. It runs itself once a day at shell startup, gated on `~/.dotcheck-stamp`.
 
-# Push to GitHub
-dfp
+### Other Aliases
+
+```bash
+het        # ssh deploy@5.161.58.238
+gateway    # ssh gateway (Tailscale host, see ~/.ssh/config)
+bcc        # basecamp
+lg         # lazygit
+t3         # things3
 ```
 
 ### Saving AUR Packages
