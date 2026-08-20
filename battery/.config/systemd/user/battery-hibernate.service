@@ -1,0 +1,7 @@
+[Unit]
+Description=Hibernate when the battery is critically low
+ConditionACPower=false
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/battery-hibernate-check 3

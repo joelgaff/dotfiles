@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Omarchy migrations rewrite user configs with `jq >tmp && mv tmp config`, and
+# that mv replaces stow's symlink with a plain file. The config keeps working,
+# but the dotfiles repo silently stops tracking it -- shell.json drifted this
+# way and lost a lock-timeout change.
+#
+# Re-stow with --adopt after every update: anything still linked is untouched,
+# anything that came unlinked gets its live content pulled into the repo and the
+# symlink restored. Then say so, because the adopted content needs reviewing.
+
+set -uo pipefail
+
+DOTFILES="$HOME/dotfiles"
+[[ -d $DOTFILES/.git ]] || exit 0
+
+cd "$DOTFILES" || exit 0
+
+mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
+  -not -name '.git' -not -name 'macos' -printf '%f\n')
+((${#packages[@]})) || exit 0
+
+stow --adopt "${packages[@]}" >/dev/null 2>&1 || exit 0
+
+git diff --quiet && exit 0
+
+omarchy-notification-send -g 󰊢 "Dotfiles re-linked" \
+  "An omarchy update rewrote stowed configs. Adopted the changes -- review with: cd ~/dotfiles && git diff"

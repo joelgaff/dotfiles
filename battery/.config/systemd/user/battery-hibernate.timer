@@ -1,0 +1,10 @@
+[Unit]
+Description=Poll the battery level for the critical-low hibernate
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target
