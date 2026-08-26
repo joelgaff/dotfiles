@@ -1,0 +1,3 @@
+#!/bin/bash
+# Obsidian CLI wrapper - bypasses user-flags that break CLI mode
+exec electron39 /usr/lib/obsidian/app.asar "$@"
