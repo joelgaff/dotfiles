@@ -21,3 +21,6 @@ export PATH="$HOME/.local/bin:$HOME/.gem/ruby/3.4.0/bin:$HOME/.gem/ruby/3.4.5/bi
 
 # LazyVPN
 export PATH="$HOME/.local/share/lazyvpn/bin:$PATH"
+
+# OpenClaw Completion
+[ -f "/home/joel/.openclaw/completions/openclaw.bash" ] && source "/home/joel/.openclaw/completions/openclaw.bash"
