@@ -7,9 +7,9 @@
 hl.monitor({ output = "eDP-1", disabled = true })
 -- hl.monitor({ output = "eDP-1", mode = "2880x1800@60", position = "0x0", scale = 2 })
 
--- monitors.lua pins workspaces 1-5 to eDP-1 for both machines and runs before
--- this file, so re-point them at the external here. framework13 keeps the
--- shared rule; only this host overrides it.
+-- 1-5 on the external, matching framework13. There is no 6-10 half here: that
+-- is the laptop panel's, and this one is disabled, so those workspaces fall
+-- through to the catch-all rule in monitors.lua and land on the external too.
 hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true })
 for ws = 2, 5 do
   hl.workspace_rule({ workspace = tostring(ws), monitor = "DP-1", persistent = true })

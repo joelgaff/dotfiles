@@ -21,11 +21,10 @@ hl.env("GDK_SCALE", "2")
 -- Fallback for any output the host file doesn't name.
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
--- Workspaces 1-5 live on the internal display on both machines.
-hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true, persistent = true })
-for ws = 2, 5 do
-  hl.workspace_rule({ workspace = tostring(ws), monitor = "eDP-1", persistent = true })
-end
+-- Workspace placement is machine-specific for the same reason: a docked machine
+-- puts 1-5 on the external and 6-10 on the internal panel, which only means
+-- anything next to the monitors those rules name. So it lives in the host file
+-- too, rather than being declared here and overridden there.
 
 local host = hostname()
 if host then
