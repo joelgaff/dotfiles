@@ -1,8 +1,8 @@
 -- Framework 13.
 
 hl.monitor({ output = "eDP-1", mode = "2880x1920@120", position = "auto-center-down", scale = 2 })
-hl.monitor({ output = "DP-4", mode = "3840x2160@60", position = "auto-center-up", scale = 1.5 }) -- port 1, far left
-hl.monitor({ output = "DP-3", mode = "3840x2160@60", position = "auto-center-up", scale = 1.5 }) -- port 2, near left
+hl.monitor({ output = "DP-4", mode = "3840x2160@60", position = "auto-center-up", scale = 1.25 }) -- port 1, far left
+hl.monitor({ output = "DP-3", mode = "3840x2160@60", position = "auto-center-up", scale = 1.25 }) -- port 2, near left
 
 -- Docked layout: workspaces 1-5 on the external, 6-10 on the internal panel.
 --
