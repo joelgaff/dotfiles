@@ -25,8 +25,10 @@ A `post-update` hook re-links everything afterwards — see [Config Drift](#conf
   `joel.display-off` shell plugin, and the `post-update` hook that repairs stow drift
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
-- **wayland** - Flags that keep Electron/CEF apps (Obsidian, Signal, Spotify, Typora,
-  1Password) off XWayland, so fractional monitor scaling stays sharp
+- **wayland** - Keeps Spotify off XWayland so fractional monitor scaling stays sharp.
+  Only Spotify needs this: Omarchy's `envs.lua` already exports
+  `ELECTRON_OZONE_PLATFORM_HINT`, which covers every Electron app, but Spotify
+  embeds CEF and ignores it
 - **systemd** - System-level config in `/etc/` — logind, sudoers, UPower (not managed by
   Stow — see [System Configuration](#system-configuration))
 
