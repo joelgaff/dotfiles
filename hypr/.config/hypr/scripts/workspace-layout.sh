@@ -28,12 +28,16 @@ internal_active=$(jq -r --arg internal "$INTERNAL" \
 mapfile -t existing < <(hyprctl workspaces -j | jq -r '.[].id')
 
 move_if_exists() {
-  local ws=$1 target=$2
+  local ws=$1 target=$2 result
   for id in "${existing[@]}"; do
     [[ $id == "$ws" ]] || continue
     # Quattro's dispatch is Lua; the old "moveworkspacetomonitor 1 DP-3" form
-    # is a parse error rather than a fallback.
-    hyprctl dispatch "hl.dsp.workspace.move({ workspace = \"$ws\", monitor = \"$target\" })" >/dev/null
+    # is a parse error rather than a fallback. hyprctl reports that on stdout
+    # and still exits 0 under a pipeline, so a bare >/dev/null hides a totally
+    # dead script -- which is exactly how the first version of this failed.
+    result=$(hyprctl dispatch \
+      "hl.dsp.workspace.move({ workspace = \"$ws\", monitor = \"$target\" })" 2>&1)
+    [[ $result == "ok" ]] || echo "workspace-layout: ws$ws -> $target failed: $result" >&2
     return
   done
 }
