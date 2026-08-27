@@ -15,3 +15,7 @@
 # Package manager files that get auto-generated
 lazy-lock.json
 package-lock.json
+
+# Numbered backups scattered by Omarchy upgrades and migrations
+*.bak
+*.bak.*
