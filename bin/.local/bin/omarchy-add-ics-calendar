@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# Subscribe Evolution Data Server to a read-only iCalendar (.ics) feed.
+# The Omarchy calendar widget lists every enabled EDS calendar, so anything
+# added here shows up in the bar alongside the Google accounts.
+#
+# Usage: omarchy-add-ics-calendar <display-name> <ics-url> [color] [refresh-minutes]
+
+set -euo pipefail
+
+name=${1:-}
+url=${2:-}
+color=${3:-#8aadf4}
+refresh=${4:-30}
+
+if [[ -z $name || -z $url ]]; then
+  echo "usage: omarchy-add-ics-calendar <display-name> <ics-url> [color] [refresh-minutes]" >&2
+  exit 64
+fi
+
+if [[ $url == webcal://* ]]; then
+  url="https://${url#webcal://}"
+fi
+
+if [[ $url != https://* && $url != http://* ]]; then
+  echo "error: URL must be http(s) or webcal, got: $url" >&2
+  exit 64
+fi
+
+host=$(python3 -c 'import sys,urllib.parse as u; print(u.urlsplit(sys.argv[1]).hostname or "")' "$url")
+port=$(python3 -c 'import sys,urllib.parse as u; s=u.urlsplit(sys.argv[1]); print(s.port or (443 if s.scheme=="https" else 80))' "$url")
+path=$(python3 -c 'import sys,urllib.parse as u; s=u.urlsplit(sys.argv[1]); print(s.path + (("?"+s.query) if s.query else "") or "/")' "$url")
+
+if [[ -z $host ]]; then
+  echo "error: could not parse a hostname out of: $url" >&2
+  exit 64
+fi
+
+security=tls
+[[ $url == http://* ]] && security=none
+
+sources=$HOME/.config/evolution/sources
+mkdir -p "$sources"
+uid=$(printf '%s' "$url" | sha1sum | cut -d' ' -f1)
+file=$sources/$uid.source
+
+if [[ -e $file ]]; then
+  echo "already subscribed (same feed URL): $file" >&2
+  exit 0
+fi
+
+umask 077
+cat > "$file" <<EOF
+[Data Source]
+DisplayName=$name
+Enabled=true
+Parent=webcal-stub
+
+[Calendar]
+BackendName=webcal
+Color=$color
+Selected=true
+
+[Authentication]
+Host=$host
+Method=none
+Port=$port
+ProxyUid=system-proxy
+RememberPassword=false
+User=
+CredentialName=
+IsExternal=false
+
+[Security]
+Method=$security
+
+[Offline]
+StaySynchronized=true
+
+[Refresh]
+Enabled=true
+IntervalMinutes=$refresh
+
+[WebDAV Backend]
+AvoidIfmatch=false
+CalendarAutoSchedule=false
+Color=
+DisplayName=
+EmailAddress=
+ResourcePath=$path
+SslTrust=
+Uri=$url
+UsermailAddress=
+EOF
+
+echo "wrote $file"
+echo "subscribed '$name' -> $host (refresh every $refresh min, read-only)"
