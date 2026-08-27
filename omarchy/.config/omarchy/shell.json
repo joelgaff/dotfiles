@@ -1,16 +1,30 @@
 {
   "bar": {
-    "centerAnchor": "omarchy.clock",
+    "centerAnchor": "sirwizardlizard.calendar",
     "layout": {
       "center": [
         {
           "id": "omarchy.indicators"
         },
         {
-          "id": "omarchy.clock",
+          "id": "sirwizardlizard.calendar",
           "format": "ddd d MMM h:mm:ss AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
-          "verticalFormat": "HH\n—\nmm"
+          "verticalFormat": "HH\n—\nmm",
+          "timeFormat": "12h",
+          "weekStartDay": 1,
+          "defaultView": "week",
+          "showWeekNumbers": true,
+          "customWeekStartHour": 8,
+          "customWeekEndHour": 18,
+          "customDayStartHour": 0,
+          "customDayEndHour": 24,
+          "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
+          "reminderMinutes": 10,
+          "calendarNames": {},
+          "calendarColors": {},
+          "showDayPanel": false,
+          "provider": "evolution-data-server"
         },
         {
           "id": "omarchy.keyboard-layout"
@@ -27,7 +41,7 @@
           "id": "omarchy.menu"
         },
         {
-          "id": "omarchy.workspaces"
+          "id": "joel.workspaces"
         }
       ],
       "right": [
@@ -73,5 +87,11 @@
       "id": "joel.display-off"
     }
   ],
-  "version": 1
+  "version": 1,
+  "disabledPlugins": [
+    "omarchy.clock"
+  ],
+  "cloneSourceRestores": [
+    "sirwizardlizard.calendar"
+  ]
 }
