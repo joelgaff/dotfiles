@@ -16,7 +16,7 @@ else
   omarchy-hyprland-monitor-internal off
   sleep 0.5
   for i in 1 2 3 4 5; do
-    hyprctl dispatch moveworkspacetomonitor "$i $EXTERNAL"
+    hyprctl dispatch "hl.dsp.workspace.move({ workspace = \"$i\", monitor = \"$EXTERNAL\" })"
   done
   sudo systemctl mask fprintd.service
   sudo systemctl stop fprintd.service
