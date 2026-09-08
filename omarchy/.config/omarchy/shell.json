@@ -15,8 +15,8 @@
           "weekStartDay": 0,
           "defaultView": "week",
           "showWeekNumbers": true,
-          "customWeekStartHour": 8,
-          "customWeekEndHour": 18,
+          "customWeekStartHour": 7,
+          "customWeekEndHour": 19,
           "customDayStartHour": 0,
           "customDayEndHour": 24,
           "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
@@ -38,15 +38,30 @@
       ],
       "left": [
         {
-          "id": "omarchy.menu"
+          "id": "joel.workspaces"
         },
         {
-          "id": "joel.workspaces"
+          "id": "omarchy.menu"
         }
       ],
       "right": [
         {
           "id": "omarchy.tray"
+        },
+        {
+          "id": "omarchy.microphone"
+        },
+        {
+          "id": "joelgaff.plain-english"
+        },
+        {
+          "id": "jankeesvw.tesla"
+        },
+        {
+          "id": "io.weirdware.blueferry"
+        },
+        {
+          "id": "io.github.weedwhitesandwine.obsiduous"
         },
         {
           "id": "omarchy.tailscale"
