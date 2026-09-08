@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# Show which microphone is active, its gain, and a live level meter.
+#
+# Usage:
+#   mic-check           show status + live meter (Ctrl-C to stop)
+#   mic-check list      list every available microphone
+#   mic-check use N     set microphone N (from `mic-check list`) as default
+#   mic-check gain 0-3  set the 3.5mm jack's hardware boost (0=off, 3=+30dB)
+#
+#   mic-check dictation  built-in mic  -- for voxtype (always works)
+#   mic-check rode       3.5mm jack    -- for recording with the Rode
+#   mic-check camera     Insta360 mic  -- needs the camera to be streaming
+#
+# The card cannot expose the built-in stereo mic and the 3.5mm jack at the
+# same time, so these switch the card profile as well as the default source.
+
+set -uo pipefail
+CARD=1
+
+status() {
+  local def; def=$(pactl get-default-source 2>/dev/null)
+  echo "Active microphone:"
+  echo "  $def"
+  case "$def" in
+    *Headset*) echo "  -> 3.5mm jack (Rode, via the headset splitter)"
+               echo "  jack boost: $(amixer -c$CARD sget 'Headset Mic Boost' 2>/dev/null | grep -oE '\[[0-9]+%\] \[[-0-9.]+dB\]' | head -1)" ;;
+    *Insta360*) echo "  -> Insta360 Link camera mic" ;;
+    *Mic1*|*Mic2*) echo "  -> laptop's built-in microphone" ;;
+  esac
+  echo "  volume: $(pactl get-source-volume @DEFAULT_SOURCE@ 2>/dev/null | grep -oE '[0-9]+%' | head -1)"
+  echo "  muted:  $(pactl get-source-mute @DEFAULT_SOURCE@ 2>/dev/null | awk '{print $2}')"
+}
+
+case "${1:-}" in
+  list)
+    pactl list sources short 2>/dev/null | grep -v monitor | nl -w2 -s'. ' | sed 's/\t/  /g'
+    ;;
+  use)
+    name=$(pactl list sources short 2>/dev/null | grep -v monitor | sed -n "${2}p" | cut -f2)
+    [[ -n "$name" ]] && pactl set-default-source "$name" && echo "now using: $name"
+    ;;
+  dictation)
+    # Internal mic. Always present, needs nothing plugged in or charged.
+    pactl set-card-profile alsa_card.pci-0000_c1_00.6 "HiFi (Mic1, Mic2, Speaker)" 2>/dev/null
+    sleep 2
+    pactl set-default-source alsa_input.pci-0000_c1_00.6.HiFi__Mic2__source 2>/dev/null
+    pactl set-source-volume @DEFAULT_SOURCE@ 60% 2>/dev/null
+    pactl set-source-mute @DEFAULT_SOURCE@ 0 2>/dev/null
+    echo "switched to the built-in mic (voxtype dictation)"
+    ;;
+  rode)
+    # The 3.5mm jack. Note this profile drops Mic2, so dictation loses its
+    # microphone until you switch back -- they cannot both be active.
+    pactl set-card-profile alsa_card.pci-0000_c1_00.6 "HiFi (Headset, Mic1, Speaker)" 2>/dev/null
+    sleep 2
+    pactl set-default-source alsa_input.pci-0000_c1_00.6.HiFi__Headset__source 2>/dev/null
+    pactl set-source-volume @DEFAULT_SOURCE@ 100% 2>/dev/null
+    pactl set-source-mute @DEFAULT_SOURCE@ 0 2>/dev/null
+    amixer -c1 sset 'Headset Mic Boost' 3 >/dev/null 2>&1
+    echo "switched to the 3.5mm jack (Rode)"
+    echo "reminder: the Rode must be powered on and the plug fully seated"
+    ;;
+  camera)
+    pactl set-default-source alsa_input.usb-Insta360_Insta360_Link_2C_Pro-02.mono-fallback 2>/dev/null
+    echo "switched to the Insta360 mic (only produces audio while the camera streams)"
+    ;;
+  gain)
+    amixer -c$CARD sset 'Headset Mic Boost' "${2:-1}" >/dev/null 2>&1
+    echo "jack boost -> $(amixer -c$CARD sget 'Headset Mic Boost' 2>/dev/null | grep -oE '\[[-0-9.]+dB\]' | head -1)"
+    ;;
+  *)
+    status
+    echo
+    echo "Live level — speak normally. Aim for the bar to peak around the |mark|."
+    echo "Ctrl-C to stop."
+    echo
+    parec -d @DEFAULT_SOURCE@ --raw --format=s16le --rate=16000 --channels=1 2>/dev/null \
+    | python3 -u -c '
+import sys, struct, math
+w = 3200
+while True:
+    b = sys.stdin.buffer.read(w*2)
+    if len(b) < w*2: break
+    s = struct.unpack("<%dh" % w, b)
+    r = math.sqrt(sum(x*x for x in s)/w)
+    db = 20*math.log10(r/32768) if r > 0 else -99
+    n = max(0, int((db+60)*40/60))
+    mark = 26  # about -21 dBFS, a good speech target
+    bar = "".join("|" if i == mark else ("#" if i < n else " ") for i in range(40))
+    tag = " CLIPPING" if max(abs(x) for x in s) >= 32700 else ""
+    try:
+        print("\r[%s] %6.1f dBFS%s " % (bar, db, tag), end="")
+    except BrokenPipeError:
+        break
+'
+    ;;
+esac

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Undo an accidental reset of the Omarchy bar configuration.
+#
+# `omarchy refresh shell` (menu: Update -> Config -> Shell) copies the shipped
+# default over ~/.config/omarchy/shell.json. That file is symlinked into the
+# dotfiles repo, so the reset lands in version control too, and the bar comes
+# back stock: custom widgets, third-party plugins and idle timings all gone.
+# It has happened three times.
+#
+# A PATH shim cannot prevent it, because the omarchy CLI execs an absolute
+# path rather than resolving through PATH. So this watches the file instead
+# and reverts the one change that is never intentional.
+#
+# The test is deliberately narrow: restore ONLY when the config is byte-for-byte
+# the shipped default. A real edit -- `omarchy bar move`, enabling a plugin,
+# dragging a widget -- can never produce that, because the committed config
+# differs from stock in many places. So ordinary changes are left completely
+# alone and this cannot fight normal use.
+#
+# Disable with:  systemctl --user disable --now omarchy-shell-config-guard.path
+
+set -uo pipefail
+
+REPO="$HOME/dotfiles"
+TRACKED="omarchy/.config/omarchy/shell.json"
+LIVE="$REPO/$TRACKED"
+DEFAULT="${OMARCHY_PATH:-/usr/share/omarchy}/config/omarchy/shell.json"
+
+log() { logger -t omarchy-shell-config-guard -- "$*"; echo "$*"; }
+
+[[ -f "$LIVE" && -f "$DEFAULT" ]] || exit 0
+
+# Only act on an exact match with the shipped default.
+cmp -s "$LIVE" "$DEFAULT" || exit 0
+
+# Nothing to restore to if the file was never committed.
+git -C "$REPO" cat-file -e "HEAD:$TRACKED" 2>/dev/null || {
+  log "shell.json was reset to defaults, but no committed version exists to restore"
+  exit 0
+}
+
+# Already stock in git too? Then stock is what the user wants; leave it.
+if git -C "$REPO" show "HEAD:$TRACKED" | cmp -s - "$DEFAULT"; then
+  exit 0
+fi
+
+log "shell.json was reset to Omarchy defaults; restoring the committed version"
+git -C "$REPO" checkout -- "$TRACKED" || { log "git checkout failed"; exit 1; }
+
+# Reload the bar so the restore is visible without the user doing anything.
+omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+omarchy restart shell >/dev/null 2>&1 || true
+
+log "bar configuration restored from git"
+command -v omarchy-notification-send >/dev/null 2>&1 &&
+  omarchy-notification-send "Bar config restored" \
+    "shell.json had been reset to Omarchy defaults. Your layout was restored from dotfiles." \
+    >/dev/null 2>&1 || true
