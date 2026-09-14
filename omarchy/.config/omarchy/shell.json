@@ -49,6 +49,15 @@
           "id": "omarchy.tray"
         },
         {
+          "id": "io.github.sonderbydk.omacaffeine",
+          "bodyWeightKg": "78",
+          "bedtimeLimitMg": "25",
+          "barDisplay": "Icon"
+        },
+        {
+          "id": "reysu.things"
+        },
+        {
           "id": "omarchy.microphone"
         },
         {
@@ -58,16 +67,10 @@
           "id": "jankeesvw.tesla"
         },
         {
-          "id": "io.weirdware.blueferry"
-        },
-        {
           "id": "io.github.weedwhitesandwine.obsiduous"
         },
         {
           "id": "omarchy.tailscale"
-        },
-        {
-          "id": "omarchy.dropbox"
         },
         {
           "id": "omarchy.agents"
