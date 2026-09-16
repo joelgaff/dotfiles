@@ -1,0 +1,336 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# worklog — what a day (or week, or month) of work across ~/Work amounted to.
+#
+#   worklog                 collect today
+#   worklog 2026-09-14      collect that day
+#   worklog --week          collect the last 7 days
+#   worklog --month         collect the last 30 days
+#   worklog card [window]   redraw the card from summary.txt
+#
+# Collecting writes commits.txt and an empty summary.txt. The sentences in
+# summary.txt are written by hand (or by Claude, via the worklog skill); the
+# card only ever draws what is in that file, never the commits themselves.
+
+require "date"
+require "cgi"
+require "fileutils"
+
+WORK = File.expand_path("~/Work")
+OUT_ROOT = File.join(WORK, "Joel")
+
+# Directory names that are never worth walking into. "z archive" is 1.6GB of
+# stale clones of repos that also live at the top level, so leaving it in
+# double-counts every commit it holds.
+PRUNE = ["node_modules", "vendor", "tmp", "z archive", ".bundle", "storage"].freeze
+
+# Every spelling of the name in this history: "Joel Gaff Jr", "Joel Gaff, Jr."
+# and the GitHub web UI's "Joel Gaff, Jr. <89562898+joelgaff@users.noreply...>".
+# Matching on the hey.com domain instead would also catch DHH, who shows up as
+# an author in the Omarchy forks.
+AUTHOR = "Joel Gaff"
+
+# A git trailer: "Co-authored-by: x", "Fixes: #12". These say nothing about what
+# changed, so they come off the body before anyone reads it.
+TRAILER = /\A[A-Za-z][\w-]*: \S/
+
+US = "\x1f"
+RS = "\x1e"
+
+# --- collecting ------------------------------------------------------------
+
+def git(dir, *args)
+  IO.popen(["git", "-C", dir, *args], err: File::NULL, &:read)
+rescue Errno::ENOENT
+  ""
+end
+
+# Repos sit at up to three levels under ~/Work: some at the top, but the two
+# busiest (omarchy-guild/rails, rails-guild/rails) are one level down, and a
+# top-level-only scan misses them entirely.
+def repos
+  # No FNM_DOTMATCH: the ".git" in the pattern is a literal and matches without
+  # it, while the flag lets each "*" match "." as well and finds every repo
+  # again under "Work/./name" — and once more per level of depth.
+  found = (1..3).flat_map do |depth|
+    Dir.glob(File.join(WORK, *Array.new(depth, "*"), ".git"))
+  end
+
+  found.map { |git_path| File.dirname(git_path) }
+       .reject { |dir| PRUNE.any? { |name| dir.split(File::SEPARATOR).include?(name) } }
+       .uniq
+       .sort
+end
+
+# Several directories share one remote — demo, runpdx, runpdx-old and
+# runpdx-old-2 all point at joelgaff/runpdx — and the directory a repo sits in
+# often is not its name: omarchy-guild/rails is joelgaff/omarchy-guild.
+def project_name(dir)
+  remote = git(dir, "remote", "get-url", "origin").strip
+  return File.basename(dir) if remote.empty?
+
+  name = remote.sub(/\.git\z/, "").split(%r{[:/]}).last
+  name.to_s.empty? ? File.basename(dir) : name
+end
+
+def strip_trailers(body)
+  lines = body.to_s.lines.map(&:chomp)
+  lines.pop while lines.last && (lines.last.strip.empty? || lines.last.match?(TRAILER))
+  lines.join("\n").strip
+end
+
+def commits_in(dir, from, to)
+  format = ["%H", "%aI", "%s", "%b"].join(US) + RS
+  log = git(dir, "log", "--all", "--no-merges",
+            "--since=#{from.strftime('%Y-%m-%dT00:00:00')}",
+            "--until=#{to.strftime('%Y-%m-%dT23:59:59')}",
+            "--author=#{AUTHOR}", "--format=#{format}")
+
+  log.split(RS).filter_map do |record|
+    sha, date, subject, body = record.sub(/\A\n/, "").split(US, 4)
+    next if sha.nil? || sha.strip.empty? || subject.to_s.strip.empty?
+
+    { sha: sha.strip[0, 7], date: date, subject: subject.strip, body: strip_trailers(body) }
+  end
+end
+
+def collect(from, to)
+  seen = {}
+  projects = Hash.new { |hash, key| hash[key] = [] }
+
+  repos.each do |dir|
+    found = commits_in(dir, from, to)
+    next if found.empty?
+
+    name = project_name(dir)
+    found.each do |commit|
+      # Deduped on sha rather than path, so a repo cloned twice counts once.
+      next if seen[commit[:sha]]
+
+      seen[commit[:sha]] = true
+      projects[name] << commit
+    end
+  end
+
+  projects.reject { |_, commits| commits.empty? }
+          .sort_by { |_, commits| -commits.size }
+          .to_h
+end
+
+def commits_text(projects, label)
+  return "#{label}\n\nNothing committed.\n" if projects.empty?
+
+  out = ["#{label}\n"]
+  projects.each do |name, commits|
+    out << name
+    out << "-" * name.length
+    commits.each do |commit|
+      out << "  #{commit[:subject]}"
+      commit[:body].each_line { |line| out << "    #{line.chomp}" } unless commit[:body].empty?
+    end
+    out << ""
+  end
+  out.join("\n")
+end
+
+# --- the card --------------------------------------------------------------
+
+WIDTH = 1200
+HEIGHT = 630
+INSET = 32
+MARGIN = 96
+
+BACKGROUND = [26, 27, 38].freeze
+BORDER = [61, 89, 161].freeze
+BRIGHT = [180, 196, 250].freeze
+MUTED = [169, 177, 214].freeze
+FAINT = [86, 95, 137].freeze
+
+# Registering a font with fontconfig goes through FreeType, which only reads
+# woff2 when it was built against brotli — true on Arch, false plenty of other
+# places, where it fails silently and Pango substitutes some other sans. The
+# ttf always works, so the ttf is what ships.
+FONT_DIR = File.join(File.dirname(File.dirname(File.realpath(__FILE__))), "share", "worklog", "fonts")
+REGULAR = File.join(FONT_DIR, "IBMPlexMono-Regular.ttf")
+SEMIBOLD = File.join(FONT_DIR, "IBMPlexMono-SemiBold.ttf")
+
+FOOTER = "joelgaff.com"
+
+# Largest first. The card takes the first of these that fits.
+SIZES = [[28, 21], [25, 19], [23, 18], [21, 17]].freeze
+
+def text_layer(string, font, fontfile, color, width: nil)
+  options = { font: font, fontfile: fontfile, rgba: true }
+  options[:width] = width if width
+  mask = Vips::Image.text(CGI.escapeHTML(string), **options)
+  mask.new_from_image(color).copy(interpretation: :srgb).bandjoin(mask[3])
+rescue Vips::Error
+  # Pango had nothing it could draw. A missing line beats a crashed card.
+  nil
+end
+
+def place(card, layer, x:, y:)
+  return card if layer.nil?
+
+  card.composite2(layer, :over, x: x, y: y).flatten
+end
+
+# Each project is a name and a description drawn as separate layers, because a
+# single Pango call can only register one font file and the two weights come
+# from two files.
+def project_blocks(projects, name_size:, body_size:)
+  projects.map do |name, description|
+    heading = text_layer(name, "IBM Plex Mono SemiBold #{name_size}", SEMIBOLD, BRIGHT)
+    body = text_layer(description, "IBM Plex Mono #{body_size}", REGULAR, MUTED,
+                      width: WIDTH - (MARGIN * 2) - 24)
+    next if heading.nil? && body.nil?
+
+    { heading: heading, body: body }
+  end.compact
+end
+
+def blocks_height(blocks, gap)
+  blocks.sum { |b| (b[:heading]&.height || 0) + 8 + (b[:body]&.height || 0) } + (gap * (blocks.size - 1))
+end
+
+# libvips complains on load about optional modules it cannot find — openslide,
+# for whole-slide medical images, which nothing here will ever ask for. The
+# message is written to fd 2 from C during the require itself, before any Ruby
+# runs and whatever VIPS_WARNING is set to, so the fd is what has to go quiet.
+# Only for the require: a real failure while drawing still has somewhere to go.
+def require_vips
+  saved = $stderr.dup
+  $stderr.reopen(File::NULL)
+  require "vips"
+ensure
+  $stderr.reopen(saved)
+  saved.close
+end
+
+def draw_card(projects, label)
+  require_vips
+
+  card = (Vips::Image.black(WIDTH, HEIGHT) + BACKGROUND).cast(:uchar).copy(interpretation: :srgb)
+  card = card.draw_rect(BORDER, INSET, INSET, WIDTH - (INSET * 2), HEIGHT - (INSET * 2), fill: false)
+  card = place(card, text_layer(label, "IBM Plex Mono 26", REGULAR, FAINT), x: MARGIN, y: 76)
+
+  top = 156
+  bottom = 512
+  gap = 30
+
+  # Set the type smaller before giving up a project, and only drop one off the
+  # end when even the smallest size overflows. A card that runs past its own
+  # border is worse than one that shows three things, but three things when
+  # four would have fitted is just wasted room.
+  shown = projects.first(4)
+  blocks = []
+  while shown.any?
+    sized = SIZES.map { |name_size, body_size| project_blocks(shown, name_size: name_size, body_size: body_size) }
+    fitting = sized.find { |candidate| blocks_height(candidate, gap) <= (bottom - top) }
+
+    if fitting
+      blocks = fitting
+      break
+    end
+
+    blocks = sized.last
+    shown = shown[0..-2]
+  end
+
+  # Centred in the band rather than hung from the top: a full card fills it
+  # either way, and a card with one project on it does not sit in a void.
+  y = top + [((bottom - top) - blocks_height(blocks, gap)) / 2, 0].max
+  blocks.each do |block|
+    card = place(card, block[:heading], x: MARGIN, y: y)
+    y += (block[:heading]&.height || 0) + 8
+    card = place(card, block[:body], x: MARGIN + 24, y: y)
+    y += (block[:body]&.height || 0) + gap
+  end
+
+  footer = text_layer(FOOTER, "IBM Plex Mono 22", REGULAR, FAINT)
+  card = place(card, footer, x: WIDTH - MARGIN - (footer&.width || 0), y: 548)
+  card
+end
+
+# name on one line, description on the lines under it, blank line between.
+def parse_summary(text)
+  text.split(/\n{2,}/).filter_map do |para|
+    lines = para.lines.map(&:strip).reject(&:empty?)
+    next if lines.empty?
+
+    name = lines.shift
+    next if name.start_with?("#")
+
+    [name, lines.join(" ")]
+  end
+end
+
+# --- windows and dispatch --------------------------------------------------
+
+def window(args)
+  if args.include?("--week")
+    to = Date.today
+    [to - 6, to]
+  elsif args.include?("--month")
+    to = Date.today
+    [to - 29, to]
+  elsif (given = args.find { |a| a =~ /\A\d{4}-\d{2}-\d{2}\z/ })
+    day = Date.parse(given)
+    [day, day]
+  else
+    [Date.today, Date.today]
+  end
+end
+
+def slug(from, to)
+  from == to ? from.to_s : "#{from}_#{to}"
+end
+
+def label_for(from, to)
+  return from.strftime("%B %-d, %Y") if from == to
+  return "#{from.strftime('%B %-d')} – #{to.strftime('%-d, %Y')}" if from.month == to.month && from.year == to.year
+
+  "#{from.strftime('%B %-d')} – #{to.strftime('%B %-d, %Y')}"
+end
+
+def render(dir, label)
+  summary_path = File.join(dir, "summary.txt")
+  projects = parse_summary(File.read(summary_path))
+
+  if projects.empty?
+    warn "Nothing in #{summary_path} yet. Write a name and a sentence under it, then run: worklog card"
+    exit 1
+  end
+
+  card_path = File.join(dir, "card.png")
+  File.binwrite(card_path, draw_card(projects, label).write_to_buffer(".png"))
+  puts card_path
+end
+
+args = ARGV.dup
+command = args.first == "card" ? args.shift : "collect"
+from, to = window(args)
+label = label_for(from, to)
+dir = File.join(OUT_ROOT, slug(from, to))
+FileUtils.mkdir_p(dir)
+
+case command
+when "collect"
+  projects = collect(from, to)
+  File.write(File.join(dir, "commits.txt"), commits_text(projects, label))
+
+  summary_path = File.join(dir, "summary.txt")
+  unless File.exist?(summary_path)
+    template = projects.keys.first(4).map { |name| "#{name}\n" }.join("\n")
+    File.write(summary_path, template)
+  end
+
+  puts commits_text(projects, label)
+  puts "commits.txt and summary.txt in #{dir}"
+when "card"
+  render(dir, label)
+else
+  warn "usage: worklog [card] [YYYY-MM-DD|--week|--month]"
+  exit 1
+end

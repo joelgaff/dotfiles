@@ -38,3 +38,8 @@ o.bind("SUPER + R", "Browser refresh", send_shortcut("CTRL", "R"))
 o.bind("SUPER + A", "Select all", send_shortcut("CTRL", "A"))
 o.bind("SUPER + Z", "Undo", send_shortcut("CTRL", "Z"), { repeating = true })
 o.bind("SUPER + SHIFT + Z", "Redo", send_shortcut("CTRL SHIFT", "Z"), { repeating = true })
+
+-- omacapture:begin (managed by `omacapture keybinds`; edit or remove freely)
+o.bind("SUPER + I", "Screenshot (Omacapture)", "omarchy-shell omacapture area")
+o.bind("SUPER + SHIFT + I", "Screenshot and annotate (Omacapture)", "omarchy-shell omacapture annotate")
+-- omacapture:end

@@ -24,3 +24,4 @@ export PATH="$HOME/.local/share/lazyvpn/bin:$PATH"
 
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.bash" ] && source "$HOME/.openclaw/completions/openclaw.bash"
+. "$HOME/.cargo/env"
