@@ -8,7 +8,7 @@
         },
         {
           "id": "sirwizardlizard.calendar",
-          "format": "ddd d MMM h:mm:ss AP",
+          "format": "ddd d MMM HH:mm",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "verticalFormat": "HH\n—\nmm",
           "timeFormat": "12h",
@@ -46,13 +46,27 @@
       ],
       "right": [
         {
-          "id": "omarchy.tray"
+          "id": "omarchy.tray",
+          "hidden": [
+            "1Password_status_icon_1",
+            "TelegramDesktop"
+          ]
+        },
+        {
+          "id": "nixfred.blip"
+        },
+        {
+          "id": "jankeesvw.time-machine"
+        },
+        {
+          "id": "joelgaff.voicenotes"
         },
         {
           "id": "io.github.ejuro.omamap"
         },
         {
-          "id": "joelgaff.hatchbox"
+          "id": "joelgaff.hatchbox",
+          "sortBy": "Most recent deploy"
         },
         {
           "id": "io.github.diyaclanker.omacapture"
@@ -102,7 +116,7 @@
       ]
     },
     "position": "top",
-    "transparent": true
+    "transparent": false
   },
   "idle": {
     "displayOff": 600,
