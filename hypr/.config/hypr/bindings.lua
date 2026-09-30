@@ -43,3 +43,9 @@ o.bind("SUPER + SHIFT + Z", "Redo", send_shortcut("CTRL SHIFT", "Z"), { repeatin
 o.bind("SUPER + I", "Screenshot (Omacapture)", "omarchy-shell omacapture area")
 o.bind("SUPER + SHIFT + I", "Screenshot and annotate (Omacapture)", "omarchy-shell omacapture annotate")
 -- omacapture:end
+
+-- Apple globe/Fn key as an extra VoxType push-to-talk key, alongside CapsLock
+-- and F9. Only Apple keyboards report Fn to the system (hid_apple sends it as
+-- XF86Fn); other keyboards handle Fn internally, so this is a no-op on them.
+o.bind("XF86Fn", "Start dictation (push-to-talk, globe key)", "voxtype record start")
+o.bind("XF86Fn", "Stop dictation (push-to-talk, globe key)", "voxtype record stop", { release = true })

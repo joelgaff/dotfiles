@@ -27,3 +27,7 @@ hl.device({ name = "apple-spi-keyboard", kb_layout = "us", kb_options = "compose
 for _, name in ipairs({ "compx-flow84@lofree", "compx-flow84@lofree-1", "compx-flow84@lofree-2" }) do
   hl.device({ name = name, kb_layout = "us", kb_options = "compose:caps, altwin:swap_alt_win" })
 end
+
+-- Apple Magic Keyboard (Bluetooth): hid_apple already maps Command to Super and
+-- Option to Alt, matching the MacBook, so skip the swap here too.
+hl.device({ name = "joel’s-magic-keyboard", kb_layout = "us", kb_options = "compose:caps" })
