@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Toggle hearing your own mic in your headphones (mic monitoring).
+#
+#   mic-monitor          toggle on/off
+#   mic-monitor on|off   force a state
+#   mic-monitor status
+#
+# Safety: only turns on when sound is going to headphones on the 3.5mm jack
+# (speakers would feed back), starts at a modest level, and mutes the
+# headphones for the moment it takes to start so nothing can burst.
+set -euo pipefail
+
+HEADPHONES="alsa_output.pci-0000_c1_00.6.HiFi__Headphones__sink"
+LEVEL="55%"        # monitoring level; the headphones' own volume is untouched
+LATENCY_MS=5       # low enough not to echo, high enough not to glitch
+
+notify() { notify-send -t 2500 "Mic monitoring" "$1" 2>/dev/null || true; echo "$1"; }
+module() { pactl list modules short | awk '$2 == "module-loopback" && /mic-monitor/ {print $1}'; }
+
+turn_off() {
+  local ids; ids=$(module)
+  [ -n "$ids" ] && for id in $ids; do pactl unload-module "$id"; done
+  notify "Off"
+}
+
+turn_on() {
+  [ -n "$(module)" ] && { notify "Already on"; return; }
+  if [ "$(pactl get-default-sink)" != "$HEADPHONES" ]; then
+    notify "Not turned on: plug headphones into the jack first (speakers would feed back)."
+    exit 1
+  fi
+  local source; source=$(pactl get-default-source)
+  pactl set-sink-mute "$HEADPHONES" 1
+  pactl load-module module-loopback source="$source" sink="$HEADPHONES" \
+    latency_msec="$LATENCY_MS" sink_input_properties=media.name=mic-monitor \
+    source_output_properties=media.name=mic-monitor >/dev/null
+  sleep 0.3
+  local input
+  input=$(pactl list sink-inputs | awk '/^Sink Input #/ {id = substr($3, 2)} /media.name = "mic-monitor"/ {print id; exit}')
+  [ -n "$input" ] && pactl set-sink-input-volume "$input" "$LEVEL"
+  pactl set-sink-mute "$HEADPHONES" 0
+  notify "On"
+}
+
+case "${1:-toggle}" in
+  on) turn_on ;;
+  off) turn_off ;;
+  status) [ -n "$(module)" ] && echo on || echo off ;;
+  toggle) if [ -n "$(module)" ]; then turn_off; else turn_on; fi ;;
+  *) echo "usage: mic-monitor [on|off|toggle|status]" >&2; exit 2 ;;
+esac

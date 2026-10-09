@@ -8,9 +8,9 @@
         },
         {
           "id": "sirwizardlizard.calendar",
-          "format": "ddd d MMM HH:mm",
+          "format": "dddd h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
-          "verticalFormat": "HH\n—\nmm",
+          "verticalFormat": "HH\n\u2014\nmm",
           "timeFormat": "12h",
           "weekStartDay": 0,
           "defaultView": "week",
@@ -53,6 +53,15 @@
           ]
         },
         {
+          "id": "jankeesvw.meeting-recorder"
+        },
+        {
+          "id": "io.github.codemonkey76.micfx"
+        },
+        {
+          "id": "io.github.thisisgm.omapods"
+        },
+        {
           "id": "nixfred.blip"
         },
         {
@@ -69,13 +78,12 @@
           "sortBy": "Most recent deploy"
         },
         {
-          "id": "io.github.diyaclanker.omacapture"
-        },
-        {
           "id": "io.github.sonderbydk.omacaffeine",
           "bodyWeightKg": "78",
           "bedtimeLimitMg": "25",
-          "barDisplay": "Icon"
+          "barDisplay": "Icon",
+          "activity": "Standing",
+          "bedtime": "22:00"
         },
         {
           "id": "reysu.things"
@@ -105,7 +113,7 @@
           "id": "omarchy.network"
         },
         {
-          "id": "omarchy.audio"
+          "id": "ssupt.audio-control"
         },
         {
           "id": "omarchy.monitor"
@@ -116,7 +124,7 @@
       ]
     },
     "position": "top",
-    "transparent": false
+    "transparent": true
   },
   "idle": {
     "displayOff": 600,
@@ -126,13 +134,18 @@
   "plugins": [
     {
       "id": "joel.display-off"
+    },
+    {
+      "id": "io.github.diyaclanker.omacapture"
     }
   ],
   "version": 1,
   "disabledPlugins": [
-    "omarchy.clock"
+    "omarchy.clock",
+    "omarchy.audio"
   ],
   "cloneSourceRestores": [
-    "sirwizardlizard.calendar"
+    "sirwizardlizard.calendar",
+    "ssupt.audio-control"
   ]
 }

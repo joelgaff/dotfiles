@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Put sound back to "normal": laptop speakers and the internal mic, with mic
+# monitoring and Mic FX off. Safe to run whether or not anything is plugged
+# into the 3.5mm jack, and it doesn't stop the jack from switching
+# automatically the next time you plug in.
+#
+#   audio-normal
+set -uo pipefail
+
+CARD="alsa_card.pci-0000_c1_00.6"
+PROFILE="HiFi (Mic1, Mic2, Speaker)"
+SPEAKERS="alsa_output.pci-0000_c1_00.6.HiFi__Speaker__sink"
+MIC="alsa_input.pci-0000_c1_00.6.HiFi__Mic2__source"
+MICFX="$HOME/.config/omarchy/plugins/io.github.codemonkey76.micfx/omarchy-mic-fx"
+
+done_steps=()
+
+# 1. Stop hearing yourself (any loopback, including mic-monitor's).
+for id in $(pactl list modules short | awk '$2 == "module-loopback" {print $1}'); do
+  pactl unload-module "$id" && done_steps+=("mic monitoring off")
+done
+
+# 2. Mic FX follows one fixed mic, so it would break once the headset is gone.
+if [ -x "$MICFX" ] && [ "$(pactl get-default-source)" = "omarchy_mic_fx" ]; then
+  "$MICFX" off >/dev/null 2>&1 && done_steps+=("Mic FX off")
+fi
+
+# 3. Switch the laptop's audio to speakers + internal mic. WirePlumber normally
+#    remembers a profile picked by hand and stops switching on plug/unplug, so
+#    turn that memory off just for this change (not saved).
+if ! pactl list cards | grep -q "Active Profile: $PROFILE"; then
+  wpctl settings device.restore-profile false >/dev/null
+  pactl set-card-profile "$CARD" "$PROFILE"
+  sleep 1
+  wpctl settings device.restore-profile true >/dev/null
+  done_steps+=("speakers + internal mic profile")
+fi
+
+# 4. Make them the defaults, unmuted.
+for _ in 1 2 3 4 5; do pactl list sinks short | grep -q "$SPEAKERS" && break; sleep 0.5; done
+pactl set-default-sink "$SPEAKERS" && pactl set-sink-mute "$SPEAKERS" 0
+pactl set-default-source "$MIC" && pactl set-source-mute "$MIC" 0
+done_steps+=("laptop speakers + internal mic as defaults")
+
+# 5. Unmute Chromium, which was muted once to stop a monitoring echo.
+for id in $(pactl list sink-inputs | awk '/^Sink Input #/ {id = substr($3, 2); muted = 0} /Mute: yes/ {muted = 1} /application.name = "Chromium"/ && muted {print id}'); do
+  pactl set-sink-input-mute "$id" 0
+done
+
+summary=$(printf '%s, ' "${done_steps[@]}"); summary=${summary%, }
+notify-send -t 3000 "Audio back to normal" "$summary" 2>/dev/null || true
+echo "Audio back to normal: $summary"
+echo "  output: $(pactl get-default-sink)"
+echo "  input:  $(pactl get-default-source)"
