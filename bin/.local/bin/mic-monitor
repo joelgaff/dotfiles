@@ -11,8 +11,8 @@
 set -euo pipefail
 
 HEADPHONES="alsa_output.pci-0000_c1_00.6.HiFi__Headphones__sink"
-LEVEL="55%"        # monitoring level; the headphones' own volume is untouched
-LATENCY_MS=5       # low enough not to echo, high enough not to glitch
+LEVEL="${MIC_MONITOR_LEVEL:-55%}"  # monitoring level; the headphones' own volume is untouched
+LATENCY_MS=1       # low enough not to echo, high enough not to glitch
 
 notify() { notify-send -t 2500 "Mic monitoring" "$1" 2>/dev/null || true; echo "$1"; }
 module() { pactl list modules short | awk '$2 == "module-loopback" && /mic-monitor/ {print $1}'; }
@@ -20,25 +20,41 @@ module() { pactl list modules short | awk '$2 == "module-loopback" && /mic-monit
 turn_off() {
   local ids; ids=$(module)
   [ -n "$ids" ] && for id in $ids; do pactl unload-module "$id"; done
+  pw-metadata -n settings 0 clock.force-quantum 0 >/dev/null 2>&1   # back to the normal buffer
   notify "Off"
 }
 
 turn_on() {
   [ -n "$(module)" ] && { notify "Already on"; return; }
-  if [ "$(pactl get-default-sink)" != "$HEADPHONES" ]; then
-    notify "Not turned on: plug headphones into the jack first (speakers would feed back)."
+  # Headphones only: the wired ones on the 3.5mm jack, USB, or Bluetooth
+  # headphones. Never the speakers (feedback).
+  local sink; sink=$(pactl get-default-sink)
+  case "$sink" in
+    "$HEADPHONES") ;;
+    bluez_output.*) LATENCY_MS=30 ;;   # Bluetooth adds its own delay; 5 ms glitches
+    alsa_output.usb-*) ;;              # USB headphones / USB-C audio adapter
+    *) sink="" ;;
+  esac
+  if [ -z "$sink" ]; then
+    notify "Not turned on: switch the output to headphones (wired, USB, or Bluetooth) first; speakers would feed back."
     exit 1
   fi
   local source; source=$(pactl get-default-source)
-  pactl set-sink-mute "$HEADPHONES" 1
-  pactl load-module module-loopback source="$source" sink="$HEADPHONES" \
-    latency_msec="$LATENCY_MS" sink_input_properties=media.name=mic-monitor \
+  # Smallest buffer while monitoring (~1.3 ms at 48 kHz) so you hear yourself
+  # with as little delay as software allows; reset by "off".
+  pw-metadata -n settings 0 clock.force-quantum 64 >/dev/null 2>&1
+  pactl set-sink-mute "$sink" 1
+  pactl load-module module-loopback source="$source" sink="$sink" \
+    latency_msec="$LATENCY_MS" \
+    "sink_input_properties='media.name=mic-monitor node.dont-reconnect=true node.dont-fallback=true'" \
     source_output_properties=media.name=mic-monitor >/dev/null
   sleep 0.3
   local input
   input=$(pactl list sink-inputs | awk '/^Sink Input #/ {id = substr($3, 2)} /media.name = "mic-monitor"/ {print id; exit}')
-  [ -n "$input" ] && pactl set-sink-input-volume "$input" "$LEVEL"
-  pactl set-sink-mute "$HEADPHONES" 0
+  # Unmute too: if the board's feedback guard muted a previous monitor stream,
+  # PipeWire remembers that mute and would start this one silent.
+  [ -n "$input" ] && pactl set-sink-input-volume "$input" "$LEVEL" && pactl set-sink-input-mute "$input" 0
+  pactl set-sink-mute "$sink" 0
   notify "On"
 }
 
