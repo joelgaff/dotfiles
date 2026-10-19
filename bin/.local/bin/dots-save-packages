@@ -6,6 +6,8 @@
 #   aur.txt      AUR packages
 #   plugins.txt  Omarchy shell plugins: <id> <git-url> [~/Work folder]
 #   webapps/     web apps you added (desktop files + icons)
+#   services.txt system services that start on boot
+#   groups.txt   groups your user is in (docker, input, ...)
 
 set -euo pipefail
 
@@ -17,6 +19,10 @@ mkdir -p "$SETUP/webapps/icons"
 pacman -Qqen | grep -vxE 'base|linux|linux-firmware|linux-omarchy(-headers)?|limine.*|(amd|intel)-ucode|vulkan-(radeon|intel)|sof-firmware|fprintd' \
   > "$SETUP/pacman.txt"
 pacman -Qqem > "$SETUP/aur.txt"
+
+systemctl list-unit-files --state=enabled --type=service,socket,timer,path --no-legend \
+  | awk '$1 !~ /@/ {print $1}' > "$SETUP/services.txt"
+id -nG | tr ' ' '\n' | grep -vx "$(id -gn)" > "$SETUP/groups.txt"
 
 # Plugins. Ones linked from ~/Work get cloned there; ones that live in the
 # dotfiles or come with a package are skipped.

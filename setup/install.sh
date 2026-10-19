@@ -31,11 +31,13 @@ yay -S --needed --noconfirm - < "$SETUP/aur.txt"
 step "Dotfiles"
 # A fresh install already has its own copies of some of these files. --adopt
 # moves them into the repo so stow can link, then checkout puts the repo's
-# versions back.
+# versions back. (Skipped when the repo has changes of its own, e.g. when
+# clone-from.sh copied it over, so those aren't thrown away.)
 cd "$DOTFILES"
+dirty=$(git status --porcelain)
 mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
   -not -name '.git' -not -name 'macos' -not -name 'setup' -printf '%f\n')
-stow --adopt "${packages[@]}" && git checkout -- .
+stow --adopt "${packages[@]}" && [ -z "$dirty" ] && git checkout -- .
 
 step "Tools (mise)"
 mise install
@@ -66,11 +68,19 @@ while read -r id url work; do
 done < "$SETUP/plugins.txt"
 omarchy-shell shell rescanPlugins 2>/dev/null || true
 
+step "Services and groups"
+for unit in $(cat "$SETUP/services.txt"); do
+  systemctl cat "$unit" >/dev/null 2>&1 && sudo systemctl enable "$unit" 2>/dev/null
+done
+for group in $(cat "$SETUP/groups.txt"); do
+  getent group "$group" >/dev/null && sudo usermod -aG "$group" "$USER"
+done
+
 step "Done"
 cat <<'EOF'
 Still to do by hand:
   - Sign in: 1Password (turn on its SSH agent + CLI integration), Dropbox,
     Tailscale (sudo tailscale up), Chromium/web apps, Signal, Spotify, etc.
   - Laptop-only /etc settings in ~/dotfiles/systemd are NOT applied (lid, hibernate).
-  - Check monitor layout in ~/.config/hypr, then log out and back in.
+  - Check monitor layout in ~/.config/hypr/monitors.lua, then reboot.
 EOF

@@ -66,6 +66,23 @@ The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, 
    ```
    These live under `macos/` so `stow */` on Linux never picks them up.
 
+### Exact Copy of Another Machine
+
+To make a new machine just like an old one (browser sign-ins, keys, documents,
+`~/Work`, every setting), not only the packages:
+
+1. On the old machine: `sudo ufw allow in on tailscale0 to any port 22 proto tcp`
+   and quit your browser.
+2. Install Omarchy on the new one with the **same username and password**.
+3. On the new machine:
+   ```bash
+   bash <(curl -fsSL https://raw.githubusercontent.com/joelgaff/dotfiles/quattro/setup/clone-from.sh) framework13
+   ```
+
+`setup/clone-from.sh` joins Tailscale, copies the whole home folder over it, then runs
+`install.sh`. Hostname, Tailscale identity, and the Dropbox/1Password/Synology
+device links stay the new machine's own; sign in to those again.
+
 ## Managing Dotfiles
 
 Defined in `shell/.aliases`, which both `.bashrc` and `.zshrc` source:
