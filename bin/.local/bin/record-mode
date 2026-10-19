@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# Set up for podcast / video recording: Insta360 Link as the camera, the Rode
+# on the 3.5mm jack as the microphone, sound in the headphones on that same
+# jack, and mic monitoring on so you hear yourself.
+#
+#   record-mode               set everything up (same as "on")
+#   record-mode on
+#   record-mode on --no-monitor   set up, but leave mic monitoring off
+#   record-mode off           back to normal (runs audio-normal)
+#   record-mode status
+#
+# Safety: refuses to start unless headphones are plugged into the jack, and the
+# profile it picks has no speaker output. Headphones that aren't on your head
+# (e.g. around your neck) can still feed back into the Rode, so it asks before
+# turning monitoring on, uses moderate gain, and monitors quietly. Raise the
+# mic volume (e.g. pactl set-source-volume @DEFAULT_SOURCE@ 75%) if you're too quiet.
+set -uo pipefail
+
+CARD="alsa_card.pci-0000_c1_00.6"
+ALSA_CARD=1
+PROFILE="HiFi (Headphones, Headset, Mic1)"
+HEADPHONES="alsa_output.pci-0000_c1_00.6.HiFi__Headphones__sink"
+RODE="alsa_input.pci-0000_c1_00.6.HiFi__Headset__source"
+CAMERA="/dev/v4l/by-id/usb-Insta360_Insta360_Link_2C_Pro-video-index0"
+MIC_VOLUME="65%"   # ~-11dB from max. PipeWire sets the jack's hardware boost from this;
+                   # 100% (+30dB boost) fed back with headphones around the neck
+MONITOR_LEVEL="25%"  # how loud you hear yourself; mic-monitor's own default is 55%
+MICFX="$HOME/.config/omarchy/plugins/io.github.codemonkey76.micfx/omarchy-mic-fx"
+
+notify() { notify-send -t 4000 "Record mode" "$1" 2>/dev/null || true; }
+
+headphones_plugged() {
+  amixer -c"$ALSA_CARD" cget iface=CARD,name='Headphone Jack' 2>/dev/null | grep -q 'values=on'
+}
+
+wait_for() { # pactl list <kind> short must contain <name>
+  for _ in $(seq 1 10); do pactl list "$1" short | grep -q "$2" && return 0; sleep 0.5; done
+  return 1
+}
+
+turn_on() {
+  if ! headphones_plugged; then
+    notify "Not started: plug headphones into the 3.5mm jack first."
+    echo "Not started: plug headphones into the 3.5mm jack first." >&2
+    exit 1
+  fi
+
+  local warnings=()
+  [ -e "$CAMERA" ] || warnings+=("Insta360 Link not found — plug it into USB")
+
+  # Mic FX follows one fixed mic, so it would sit on the wrong one.
+  if [ -x "$MICFX" ] && [ "$(pactl get-default-source)" = "omarchy_mic_fx" ]; then
+    "$MICFX" off >/dev/null 2>&1
+  fi
+
+  # Headphones + jack mic. Drop any monitoring first so nothing is looped
+  # through while the card switches. WirePlumber would otherwise remember this
+  # hand-picked profile and stop switching on plug/unplug, so don't let it save.
+  mic-monitor off >/dev/null 2>&1
+  if ! pactl list cards | grep -q "Active Profile: $PROFILE"; then
+    wpctl settings device.restore-profile false >/dev/null
+    pactl set-card-profile "$CARD" "$PROFILE"
+    sleep 1
+    wpctl settings device.restore-profile true >/dev/null
+  fi
+
+  if ! wait_for sinks "$HEADPHONES" || ! wait_for sources "$RODE"; then
+    notify "Couldn't switch to the headphone jack. Try replugging it."
+    echo "Headphones or jack mic didn't appear after switching profile." >&2
+    exit 1
+  fi
+
+  pactl set-default-sink "$HEADPHONES" && pactl set-sink-mute "$HEADPHONES" 0
+  pactl set-default-source "$RODE"
+  # WirePlumber restores the jack's saved volume a moment after the profile
+  # switch, so set it until it sticks.
+  for _ in 1 2 3 4 5; do
+    pactl set-source-volume "$RODE" "$MIC_VOLUME"
+    sleep 0.5
+    pactl get-source-volume "$RODE" | grep -q " ${MIC_VOLUME} " && break
+  done
+  pactl set-source-mute "$RODE" 0
+
+  local monitoring="off"
+  if [ "$want_monitor" = yes ]; then
+    if [ -t 0 ]; then
+      read -r -p "Headphones ON your head (not around your neck)? Turn on mic monitoring? [y/N] " answer
+      [[ "$answer" =~ ^[Yy] ]] || want_monitor=no
+    else
+      want_monitor=no
+      warnings+=("monitoring left off (no terminal to confirm) — run: mic-monitor on")
+    fi
+  fi
+  if [ "$want_monitor" = yes ]; then
+    if MIC_MONITOR_LEVEL="$MONITOR_LEVEL" mic-monitor on >/dev/null; then
+      monitoring="on"
+    else
+      warnings+=("mic monitoring didn't start")
+    fi
+  fi
+
+  local msg="Rode → headphones, monitoring $monitoring"
+  [ -e "$CAMERA" ] && msg+=", camera $(readlink -f "$CAMERA")"
+  [ ${#warnings[@]} -gt 0 ] && msg+=$'\n'"$(printf '⚠ %s\n' "${warnings[@]}")"
+  notify "$msg"
+  echo "Record mode on"
+  status
+  echo "Reminder: the Rode must be powered on and its plug fully seated. Check levels with: mic-check"
+}
+
+status() {
+  local profile
+  profile=$(pactl list cards | awk -v c="$CARD" '$0 ~ "Name: "c {f=1} f && /Active Profile:/ {sub(/.*Active Profile: /, ""); print; exit}')
+  echo "  profile:    $profile"
+  echo "  output:     $(pactl get-default-sink)"
+  echo "  input:      $(pactl get-default-source)"
+  echo "  mic volume: $(pactl get-source-volume @DEFAULT_SOURCE@ 2>/dev/null | grep -oE '[0-9]+%' | head -1), boost $(amixer -c"$ALSA_CARD" sget 'Headset Mic Boost' 2>/dev/null | grep -oE '\[[-0-9.]+dB\]' | head -1)"
+  echo "  headphones: $(headphones_plugged && echo plugged in || echo NOT plugged in)"
+  echo "  monitoring: $(mic-monitor status 2>/dev/null)"
+  if [ -e "$CAMERA" ]; then
+    echo "  camera:     Insta360 Link at $(readlink -f "$CAMERA")"
+  else
+    echo "  camera:     Insta360 Link not connected"
+  fi
+}
+
+want_monitor=yes
+[ "${2:-}" = "--no-monitor" ] || [ "${1:-}" = "--no-monitor" ] && want_monitor=no
+[ "${1:-}" = "--no-monitor" ] && set -- on
+
+case "${1:-on}" in
+  on) turn_on ;;
+  off) exec audio-normal ;;
+  status) status ;;
+  *) echo "usage: record-mode [on|off|status]" >&2; exit 2 ;;
+esac
