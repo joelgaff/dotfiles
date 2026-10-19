@@ -1,0 +1,17 @@
+io.github.codemonkey76.micfx https://github.com/codemonkey76/omarchy-micfx.git
+io.github.diyaclanker.omacapture https://github.com/diyahir/omacapture.git
+io.github.ehlxr.cliampui https://github.com/ehlxr/omarchy-cliampui.git
+io.github.ejuro.omamap https://github.com/ejuro/omamap.git
+io.github.sonderbydk.omacaffeine https://github.com/sonderbydk/omacaffeine omacaffeine
+io.github.thisisgm.omapods https://github.com/thisisgm/omarchy-pods
+io.github.weedwhitesandwine.obsiduous https://github.com/weedwhitesandwine/obsiduous.git
+jankeesvw.tesla https://github.com/jankeesvw/omarchy-tesla.git
+jankeesvw.time-machine https://github.com/jankeesvw/omarchy-time-machine.git omarchy-time-machine
+joelgaff.hatchbox git@github.com:joelgaff/omarchy-hatchbox.git omarchy-hatchbox
+joelgaff.monitor-mix git@github.com:joelgaff/omarchy-monitor-mix.git omarchy-monitor-mix
+joelgaff.plain-english git@github.com:joelgaff/omarchy-plain-english.git omarchy-plain-english
+joelgaff.voicenotes git@github.com:joelgaff/omarchy-voicenotes.git omarchy-voicenotes
+nixfred.blip https://github.com/nixfred/blip.git
+reysu.things https://github.com/reysu/omarchy-things.git
+sirwizardlizard.calendar https://github.com/SirWizardLizard/omarchy-caldav-calendar
+ssupt.audio-control https://github.com/ssupt/omarchy-audio-control.git

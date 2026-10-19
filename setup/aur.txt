@@ -1,0 +1,9 @@
+debtap
+hyprmon
+omarchy-meeting-recorder-bin
+onedrive-abraunegg
+rawmakase
+synology-drive
+teams-for-linux-bin
+things3-cloud
+toggl-cli

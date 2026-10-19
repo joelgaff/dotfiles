@@ -24,6 +24,7 @@ A `post-update` hook re-links everything afterwards — see [Config Drift](#conf
 - **omarchy** - Omarchy (Quattro) Quickshell settings — bar layout, idle timers, the
   `joel.display-off` shell plugin, and the `post-update` hook that repairs stow drift
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
+- **setup** - Not stowed: `install.sh` and the package/plugin/web app lists it reads (see [Fresh Machine Setup](#fresh-machine-setup))
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
 - **wayland** - Keeps Spotify off XWayland so fractional monitor scaling stays sharp.
   Only Spotify needs this: Omarchy's `envs.lua` already exports
@@ -46,29 +47,24 @@ The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, 
 
 ## Fresh Machine Setup
 
-1. Install Omarchy, then clone this repo:
+1. Install Omarchy, then set up 1Password and turn on its SSH agent (the clone
+   and your own plugin repos come from GitHub over SSH).
+
+2. Clone this repo and run the installer:
    ```bash
    git clone git@github.com:joelgaff/dotfiles.git ~/dotfiles
-   cd ~/dotfiles
+   ~/dotfiles/setup/install.sh
    ```
+   It installs your packages (pacman + AUR), stows every package here (the
+   repo's versions win over the fresh install's defaults), runs `mise install`,
+   restores your web apps, and installs your shell plugins. It's safe to run
+   again. At the end it lists what still needs doing by hand (sign-ins, monitors).
 
-2. Stow all cross-platform packages (excludes the `macos/` dir):
-   ```bash
-   stow $(ls -d */ | grep -vx 'macos/')
-   ```
-
-   On **macOS only**, also stow the Mac-specific packages:
+   On **macOS only**, stow the Mac-specific packages instead:
    ```bash
    stow -d macos -t ~ skhd
    ```
    These live under `macos/` so `stow */` on Linux never picks them up.
-
-3. Reload your shell:
-   ```bash
-   source ~/.bashrc
-   ```
-
-4. Run `omarchy-import` to restore any additional settings from a previous export.
 
 ## Managing Dotfiles
 
@@ -96,17 +92,15 @@ lg         # lazygit
 t3         # things3
 ```
 
-### Saving AUR Packages
+### Saving What's Installed
 
-Run `dots-save-packages` to save a list of your AUR packages to `aur-packages.txt` in the repo root. This makes it easy to reinstall them on a fresh machine:
+Run `dots-save-packages` before setting up a new machine (and now and then) to
+refresh the snapshot in `setup/` that `setup/install.sh` reads, then commit it:
 
-```bash
-# Save current AUR packages
-dots-save-packages
-
-# On a new machine, install them with your AUR helper
-yay -S - < ~/dotfiles/aur-packages.txt
-```
+- `pacman.txt` / `aur.txt`: packages you installed (kernel, bootloader, CPU and
+  GPU drivers are left out; the Omarchy installer picks those per machine)
+- `plugins.txt`: Omarchy shell plugins (yours get cloned into `~/Work`)
+- `webapps/`: web apps you added, with their icons
 
 ### System Configuration
 
@@ -146,7 +140,7 @@ symlink restored. If it adopted anything, it sends a notification — review wit
 To check by hand at any time:
 
 ```bash
-cd ~/dotfiles && stow --adopt $(ls -d */ | grep -vx 'macos/') && git status
+cd ~/dotfiles && stow --adopt $(ls -d */ | grep -vxE 'macos/|setup/') && git status
 ```
 
 ### Adding a New Package

@@ -1,11 +1,49 @@
 #!/bin/bash
 
-# Save AUR package list to the dotfiles repo
-# Pulls logic from omarchy-export (pacman -Qqm)
+# Snapshot what's installed on this machine into ~/dotfiles/setup, so
+# setup/install.sh can rebuild it on a new one:
+#   pacman.txt   official-repo packages you installed on purpose
+#   aur.txt      AUR packages
+#   plugins.txt  Omarchy shell plugins: <id> <git-url> [~/Work folder]
+#   webapps/     web apps you added (desktop files + icons)
 
-DOTFILES_DIR="$HOME/dotfiles"
+set -euo pipefail
 
-pacman -Qqm > "$DOTFILES_DIR/aur-packages.txt" 2>/dev/null
+SETUP="$HOME/dotfiles/setup"
+mkdir -p "$SETUP/webapps/icons"
 
-AUR_COUNT=$(wc -l < "$DOTFILES_DIR/aur-packages.txt")
-echo "Saved $AUR_COUNT AUR packages to aur-packages.txt"
+# Kernel, bootloader, CPU microcode and GPU drivers are picked by the Omarchy
+# installer for each machine's hardware, so they're left out.
+pacman -Qqen | grep -vxE 'base|linux|linux-firmware|linux-omarchy(-headers)?|limine.*|(amd|intel)-ucode|vulkan-(radeon|intel)|sof-firmware|fprintd' \
+  > "$SETUP/pacman.txt"
+pacman -Qqem > "$SETUP/aur.txt"
+
+# Plugins. Ones linked from ~/Work get cloned there; ones that live in the
+# dotfiles or come with a package are skipped.
+: > "$SETUP/plugins.txt"
+for dir in "$HOME/.config/omarchy/plugins"/*/; do
+  dir=${dir%/}
+  id=$(basename "$dir")
+  target=$(readlink -f "$dir")
+  case "$target" in
+    "$HOME/dotfiles/"* | /usr/*) continue ;;
+  esac
+  url=$(git -C "$target" remote get-url origin 2>/dev/null) || continue
+  if [[ $target == "$HOME/Work/"* ]]; then
+    echo "$id $url ${target#"$HOME/Work/"}" >> "$SETUP/plugins.txt"
+  else
+    echo "$id $url" >> "$SETUP/plugins.txt"
+  fi
+done
+
+# Web apps made with Omarchy's "Install Web App" (they launch through
+# omarchy-launch-webapp), plus the custom icons they use.
+rm -f "$SETUP/webapps"/*.desktop "$SETUP/webapps/icons"/*
+apps="$HOME/.local/share/applications"
+grep -l omarchy-launch-webapp "$apps"/*.desktop | while read -r file; do
+  sed "s|$HOME|@HOME@|g" "$file" > "$SETUP/webapps/$(basename "$file")"
+done
+cp "$apps/icons"/* "$SETUP/webapps/icons/" 2>/dev/null || true
+
+echo "Saved $(wc -l < "$SETUP/pacman.txt") packages, $(wc -l < "$SETUP/aur.txt") AUR packages," \
+  "$(wc -l < "$SETUP/plugins.txt") plugins, $(ls "$SETUP/webapps"/*.desktop | wc -l) web apps to $SETUP"

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=SharePoint
+Comment=SharePoint
+Exec=omarchy-launch-webapp https://irondrive.sharepoint.com/sites/NAOPS-NorthAmericanOperations/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FNAOPS%2DNorthAmericanOperations%2FShared%20Documents%2FIRONMAN%20Event%20Folders%2FIRONMAN%2070%2E3%20Oregon&viewid=029b605a%2D35e9%2D471e%2Da58b%2Dcb37da488fe9&FolderCTID=0x0120007BD8E27727011544AEC70698101E3FCC
+Terminal=false
+Type=Application
+Icon=@HOME@/.local/share/applications/icons/SharePoint.png
+StartupNotify=true

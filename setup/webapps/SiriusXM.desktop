@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=SiriusXM
+Comment=SiriusXM
+Exec=omarchy-launch-webapp https://www.siriusxm.com/player/channel-linear/entity/067801cb-bb3f-1707-dd21-d77e06bb27c0
+Terminal=false
+Type=Application
+Icon=@HOME@/.local/share/applications/icons/sirius.png
+StartupNotify=true

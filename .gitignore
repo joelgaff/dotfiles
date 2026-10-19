@@ -39,3 +39,8 @@ bin/imsg
 bin/imsg-send
 bin/imsg-read
 bin/contacts
+
+# Links into ~/.local/opt/platform-tools (Android SDK download), which isn't in
+# this repo, so they'd be broken links on another machine.
+bin/.local/bin/adb
+bin/.local/bin/fastboot

@@ -17,7 +17,7 @@ DOTFILES="$HOME/dotfiles"
 cd "$DOTFILES" || exit 0
 
 mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
-  -not -name '.git' -not -name 'macos' -printf '%f\n')
+  -not -name '.git' -not -name 'macos' -not -name 'setup' -printf '%f\n')
 ((${#packages[@]})) || exit 0
 
 stow --adopt "${packages[@]}" >/dev/null 2>&1 || exit 0
