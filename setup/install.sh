@@ -6,7 +6,7 @@
 # First set up 1Password and turn on its SSH agent: the clone below and your
 # own plugin repos come from GitHub over SSH.
 #
-#   git clone -b quattro git@github.com:joelgaff/dotfiles.git ~/dotfiles
+#   git clone git@github.com:joelgaff/dotfiles.git ~/dotfiles
 #   ~/dotfiles/setup/install.sh
 #
 # The lists it reads are written by `dots-save-packages` on the old machine.

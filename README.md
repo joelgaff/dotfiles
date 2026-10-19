@@ -52,7 +52,7 @@ The `bin` package adds `omarchy-export` and `omarchy-import` to `~/.local/bin`, 
 
 2. Clone this repo and run the installer:
    ```bash
-   git clone -b quattro git@github.com:joelgaff/dotfiles.git ~/dotfiles
+   git clone git@github.com:joelgaff/dotfiles.git ~/dotfiles
    ~/dotfiles/setup/install.sh
    ```
    It installs your packages (pacman + AUR), stows every package here (the
