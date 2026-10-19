@@ -31,8 +31,8 @@ yay -S --needed --noconfirm - < "$SETUP/aur.txt"
 step "Dotfiles"
 # A fresh install already has its own copies of some of these files. --adopt
 # moves them into the repo so stow can link, then checkout puts the repo's
-# versions back. (Skipped when the repo has changes of its own, e.g. when
-# clone-from.sh copied it over, so those aren't thrown away.)
+# versions back. (Skipped when the repo has uncommitted changes of its own,
+# so those aren't thrown away.)
 cd "$DOTFILES"
 dirty=$(git status --porcelain)
 mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
