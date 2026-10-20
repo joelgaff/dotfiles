@@ -14,3 +14,15 @@ hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persisten
 for ws = 2, 5 do
   hl.workspace_rule({ workspace = tostring(ws), monitor = "DP-1", persistent = true })
 end
+
+-- Laptop watchers (moved from autostart.lua so they don't run on the beelink).
+-- Keeps workspaces 1-5 on the external and 6-10 on the internal panel as
+-- monitors come and go. See scripts/workspace-layout-watch.sh.
+o.launch_on_start(os.getenv("HOME") .. "/.config/hypr/scripts/workspace-layout-watch.sh")
+
+-- Hides Chromium's "is sharing your screen" bar when Omarchy's map-time rule
+-- misses it. See scripts/share-bar-hide-watch.sh.
+o.launch_on_start(os.getenv("HOME") .. "/.config/hypr/scripts/share-bar-hide-watch.sh")
+
+-- MacBook internal keyboard: Command already lands on Super, so don't swap.
+hl.device({ name = "apple-spi-keyboard", kb_layout = "us", kb_options = "compose:caps" })

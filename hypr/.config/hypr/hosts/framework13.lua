@@ -24,3 +24,12 @@ hl.workspace_rule({ workspace = "6", monitor = "eDP-1", default = true })
 for ws = 7, 10 do
   hl.workspace_rule({ workspace = tostring(ws), monitor = "eDP-1" })
 end
+
+-- Laptop watchers (moved from autostart.lua so they don't run on the beelink).
+-- Keeps workspaces 1-5 on the external and 6-10 on the internal panel as
+-- monitors come and go. See scripts/workspace-layout-watch.sh.
+o.launch_on_start(os.getenv("HOME") .. "/.config/hypr/scripts/workspace-layout-watch.sh")
+
+-- Hides Chromium's "is sharing your screen" bar when Omarchy's map-time rule
+-- misses it. See scripts/share-bar-hide-watch.sh.
+o.launch_on_start(os.getenv("HOME") .. "/.config/hypr/scripts/share-bar-hide-watch.sh")
