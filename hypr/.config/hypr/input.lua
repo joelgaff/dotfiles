@@ -31,3 +31,8 @@ end
 -- Apple Magic Keyboard (Bluetooth): hid_apple already maps Command to Super and
 -- Option to Alt, matching the MacBook, so skip the swap here too.
 hl.device({ name = "joel’s-magic-keyboard", kb_layout = "us", kb_options = "compose:caps" })
+
+-- Wired Apple keyboard on the beelink: same as the Magic Keyboard, no swap.
+for _, name in ipairs({ "apple--inc-apple-keyboard", "apple--inc-apple-keyboard-1" }) do
+  hl.device({ name = name, kb_layout = "us", kb_options = "compose:caps" })
+end
