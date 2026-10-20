@@ -3,12 +3,8 @@
 hl.config({
   input = {
     kb_layout = "us",
-    -- compose:caps = Caps Lock as Compose. altwin:swap_alt_win puts Super on
-    -- the key next to the spacebar, Mac-style, on every keyboard. Apple
-    -- keyboards would arrive with Command already on Super, so
-    -- systemd/etc/modprobe.d/90-hid-apple-swap.conf has the kernel report
-    -- them in PC order first; then this one swap fits them too, including
-    -- keyboards plugged in or paired later.
+    -- compose:caps = Caps Lock as Compose. altwin:swap_alt_win suits the
+    -- external Lofree; the MacBook's own keyboard is exempted below.
     kb_options = "compose:caps, altwin:swap_alt_win",
     repeat_rate = 40,
     repeat_delay = 600,
@@ -24,6 +20,19 @@ hl.config({
 o.window("(Alacritty|kitty|foot)", { scroll_touchpad = 1.5 })
 o.window("com.mitchellh.ghostty", { scroll_touchpad = 0.2 })
 
--- MacBook internal keyboard: driven by applespi, not hid_apple, so the
--- modprobe option doesn't reach it and Command already lands on Super.
+-- MacBook internal keyboard: Command already lands on Super, so don't swap.
 hl.device({ name = "apple-spi-keyboard", kb_layout = "us", kb_options = "compose:caps" })
+
+-- Lofree Flow84, under each name it registers as.
+for _, name in ipairs({ "compx-flow84@lofree", "compx-flow84@lofree-1", "compx-flow84@lofree-2" }) do
+  hl.device({ name = name, kb_layout = "us", kb_options = "compose:caps, altwin:swap_alt_win" })
+end
+
+-- Apple Magic Keyboard (Bluetooth): hid_apple already maps Command to Super and
+-- Option to Alt, matching the MacBook, so skip the swap here too.
+hl.device({ name = "joel’s-magic-keyboard", kb_layout = "us", kb_options = "compose:caps" })
+
+-- Wired Apple Keyboard (USB): same as the Magic Keyboard, no swap.
+for _, name in ipairs({ "apple--inc-apple-keyboard", "apple--inc-apple-keyboard-1" }) do
+  hl.device({ name = name, kb_layout = "us", kb_options = "compose:caps" })
+end
