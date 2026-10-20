@@ -37,6 +37,11 @@ cd "$DOTFILES"
 dirty=$(git status --porcelain)
 mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
   -not -name '.git' -not -name 'macos' -not -name 'setup' -printf '%f\n')
+# --adopt can't take over a link Omarchy made (e.g. nvim's theme.lua), and
+# one conflict stops stow linking anything, so remove those links first.
+stow -n --adopt "${packages[@]}" 2>&1 \
+  | sed -n 's/.*existing target is not owned by stow: //p' \
+  | while read -r target; do [ -L "$HOME/$target" ] && rm "$HOME/$target"; done
 stow --adopt "${packages[@]}" && [ -z "$dirty" ] && git checkout -- .
 
 step "Tools (mise)"

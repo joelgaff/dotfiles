@@ -44,3 +44,12 @@ bin/contacts
 # this repo, so they'd be broken links on another machine.
 bin/.local/bin/adb
 bin/.local/bin/fastboot
+
+# Links to fixed paths that exist only on one machine (~/Work checkouts, venvs).
+# Stow refuses absolute links, and one refusal aborts the whole stow.
+bin/.local/bin/newrails
+bin/.local/bin/omarchy-icloud-photos
+bin/.local/bin/omarchy-icloud-photos-sync
+bin/.local/bin/py-spy
+bin/.local/bin/python3.13
+bin/.local/bin/rails-now
