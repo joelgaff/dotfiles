@@ -7,24 +7,24 @@
           "id": "omarchy.indicators"
         },
         {
-          "id": "sirwizardlizard.calendar",
+          "calendarColors": {},
+          "calendarNames": {},
+          "customDayEndHour": 24,
+          "customDayStartHour": 0,
+          "customWeekEndHour": 19,
+          "customWeekStartHour": 7,
+          "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
+          "defaultView": "week",
           "format": "dddd h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
-          "verticalFormat": "HH\n—\nmm",
-          "timeFormat": "12h",
-          "weekStartDay": 0,
-          "defaultView": "week",
-          "showWeekNumbers": true,
-          "customWeekStartHour": 7,
-          "customWeekEndHour": 19,
-          "customDayStartHour": 0,
-          "customDayEndHour": 24,
-          "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
+          "id": "sirwizardlizard.calendar",
+          "provider": "evolution-data-server",
           "reminderMinutes": 10,
-          "calendarNames": {},
-          "calendarColors": {},
           "showDayPanel": false,
-          "provider": "evolution-data-server"
+          "showWeekNumbers": true,
+          "timeFormat": "12h",
+          "verticalFormat": "HH\n—\nmm",
+          "weekStartDay": 0
         },
         {
           "id": "omarchy.keyboard-layout"
@@ -46,11 +46,11 @@
       ],
       "right": [
         {
-          "id": "omarchy.tray",
           "hidden": [
             "1Password_status_icon_1",
             "TelegramDesktop"
-          ]
+          ],
+          "id": "omarchy.tray"
         },
         {
           "id": "jankeesvw.meeting-recorder"
@@ -78,14 +78,14 @@
           "sortBy": "Most recent deploy"
         },
         {
-          "id": "io.github.sonderbydk.omacaffeine",
-          "bodyWeightKg": "78",
-          "bedtimeLimitMg": "25",
-          "barDisplay": "Icon",
           "activity": "Standing",
+          "barDisplay": "Icon",
           "bedtime": "22:00",
+          "bedtimeLimitMg": "25",
+          "bodyWeightKg": "78",
+          "cupMode": "Today's intake",
           "dailyLimitMg": "400",
-          "cupMode": "Today's intake"
+          "id": "io.github.sonderbydk.omacaffeine"
         },
         {
           "id": "reysu.things"
@@ -118,6 +118,9 @@
           "id": "ssupt.audio-control"
         },
         {
+          "id": "joelgaff.monitor-mix"
+        },
+        {
           "id": "omarchy.monitor"
         },
         {
@@ -128,6 +131,14 @@
     "position": "top",
     "transparent": true
   },
+  "cloneSourceRestores": [
+    "sirwizardlizard.calendar",
+    "ssupt.audio-control"
+  ],
+  "disabledPlugins": [
+    "omarchy.clock",
+    "omarchy.audio"
+  ],
   "idle": {
     "displayOff": 600,
     "lock": 3600,
@@ -141,13 +152,5 @@
       "id": "io.github.diyaclanker.omacapture"
     }
   ],
-  "version": 1,
-  "disabledPlugins": [
-    "omarchy.clock",
-    "omarchy.audio"
-  ],
-  "cloneSourceRestores": [
-    "sirwizardlizard.calendar",
-    "ssupt.audio-control"
-  ]
+  "version": 1
 }
