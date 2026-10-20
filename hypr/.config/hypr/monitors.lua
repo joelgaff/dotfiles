@@ -2,7 +2,8 @@
 -- List current monitors and supported resolutions with: hyprctl monitors all
 
 -- Monitor and workspace layout is machine-specific, so it lives in
--- hosts/<hostname>.lua. This repo is shared by framework13 and mbp-omarchy;
+-- hosts/<hostname>.lua. This repo is shared by framework13, mbp-omarchy and
+-- beelink (which also uses its host file for an auto-lock at login);
 -- before Quattro both machines' monitors sat in one file with the inactive
 -- one commented out, which broke on every upgrade.
 
