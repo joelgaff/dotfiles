@@ -30,6 +30,9 @@ end
 -- Option to Alt, matching the MacBook, so skip the swap here too.
 hl.device({ name = "joel’s-magic-keyboard", kb_layout = "us", kb_options = "compose:caps" })
 
+-- Magic Keyboard with Touch ID, which registers under its model name.
+hl.device({ name = "apple-inc.-magic-keyboard-with-touch-id", kb_layout = "us", kb_options = "compose:caps" })
+
 -- Wired Apple Keyboard (USB): same as the Magic Keyboard, no swap.
 for _, name in ipairs({ "apple--inc-apple-keyboard", "apple--inc-apple-keyboard-1" }) do
   hl.device({ name = name, kb_layout = "us", kb_options = "compose:caps" })
