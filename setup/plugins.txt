@@ -9,6 +9,7 @@ jankeesvw.tesla https://github.com/jankeesvw/omarchy-tesla.git
 jankeesvw.time-machine https://github.com/jankeesvw/omarchy-time-machine.git omarchy-time-machine
 joelgaff.hatchbox git@github.com:joelgaff/omarchy-hatchbox.git omarchy-hatchbox
 joelgaff.plain-english git@github.com:joelgaff/omarchy-plain-english.git omarchy-plain-english
+joelgaff.shurectl git@github.com:joelgaff/omarchy-shurectl.git omarchy-shurectl
 joelgaff.voicenotes git@github.com:joelgaff/omarchy-voicenotes.git omarchy-voicenotes
 nixfred.blip https://github.com/nixfred/blip.git
 reysu.things https://github.com/reysu/omarchy-things.git
