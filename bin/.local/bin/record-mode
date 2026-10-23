@@ -3,6 +3,10 @@
 # on the 3.5mm jack as the microphone, sound in the headphones on that same
 # jack, and mic monitoring on so you hear yourself.
 #
+# With the Shure MV7+ plugged into USB it is the mic instead, through Mic FX,
+# and sound goes to the headphone jack on the mic, where the MV7+ lets you
+# hear yourself in hardware with no delay (so no software monitoring).
+#
 #   record-mode               set everything up (same as "on")
 #   record-mode on
 #   record-mode on --no-monitor   set up, but leave mic monitoring off
@@ -39,6 +43,26 @@ wait_for() { # pactl list <kind> short must contain <name>
 }
 
 turn_on() {
+  local mv7_mic mv7_out
+  mv7_mic=$(pactl list sources short | awk '/usb-Shure_Inc_Shure_MV7/ {print $2; exit}')
+  mv7_out=$(pactl list sinks short | awk '/usb-Shure_Inc_Shure_MV7/ {print $2; exit}')
+  if [ -n "$mv7_mic" ]; then
+    mic-monitor off >/dev/null 2>&1
+    if [ -x "$MICFX" ]; then
+      "$MICFX" device "$mv7_mic" >/dev/null 2>&1
+      "$MICFX" on >/dev/null 2>&1
+    fi
+    [ "$(pactl get-default-source)" = omarchy_mic_fx ] || pactl set-default-source "$mv7_mic"
+    pactl set-source-mute "$mv7_mic" 0
+    [ -n "$mv7_out" ] && pactl set-default-sink "$mv7_out" && pactl set-sink-mute "$mv7_out" 0
+    local msg="MV7+ → its own headphone jack (hear yourself on the mic, no delay)"
+    [ -e "$CAMERA" ] || msg+=$'\n'"⚠ Insta360 Link not found — plug it into USB"
+    notify "$msg"
+    echo "Record mode on (MV7+)"
+    status
+    return
+  fi
+
   if ! headphones_plugged; then
     notify "Not started: plug headphones into the 3.5mm jack first."
     echo "Not started: plug headphones into the 3.5mm jack first." >&2

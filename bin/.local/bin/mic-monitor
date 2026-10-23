@@ -31,6 +31,11 @@ turn_on() {
   local sink; sink=$(pactl get-default-sink)
   case "$sink" in
     "$HEADPHONES") ;;
+    # The MV7+ mixes its own mic into its headphone jack in hardware (no
+    # delay). A loopback on top would be a second, late copy: an echo.
+    alsa_output.usb-Shure_Inc_Shure_MV7*)
+      notify "Not needed: headphones in the MV7+ hear the mic directly (no delay). Set the mix on the mic's touch panel or in the Shure MOTIV app."
+      return ;;
     bluez_output.*) LATENCY_MS=30 ;;   # Bluetooth adds its own delay; 5 ms glitches
     alsa_output.usb-*) ;;              # USB headphones / USB-C audio adapter
     *) sink="" ;;
