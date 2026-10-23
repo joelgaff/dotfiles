@@ -1,8 +1,10 @@
 debtap
 hyprmon
+iloader-bin
 omarchy-meeting-recorder-bin
 onedrive-abraunegg
 rawmakase
+shurectl
 synology-drive
 teams-for-linux-bin
 things3-cloud

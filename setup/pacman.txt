@@ -190,6 +190,7 @@ ufw
 ufw-docker
 unzip
 usage
+usbmuxd
 usbutils
 uv
 uwsm
