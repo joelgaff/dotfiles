@@ -53,3 +53,6 @@ bin/.local/bin/omarchy-icloud-photos-sync
 bin/.local/bin/py-spy
 bin/.local/bin/python3.13
 bin/.local/bin/rails-now
+
+# Built from the json-cli branch of joelgaff/shurectl; the AUR package is the fallback.
+bin/.local/bin/shurectl
