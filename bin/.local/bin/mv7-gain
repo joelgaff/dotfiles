@@ -10,7 +10,7 @@ card=$(grep -l '^MV7' /proc/asound/card*/id 2>/dev/null | head -1 | grep -o 'car
 [ -n "${card:-}" ] || { echo "MV7+ not plugged in" >&2; exit 1; }
 
 if [ $# -eq 0 ]; then
-  steps=$(amixer -c "$card" cget iface=MIXER,name='Microphone Capture Volume' | grep -o 'values=[0-9]*' | tr -dc 0-9)
+  steps=$(amixer -c "$card" cget iface=MIXER,name='Microphone Capture Volume' | grep -o 'values=[0-9]*' | tail -1 | tr -dc 0-9)
   echo "MV7+ gain: +$((steps / 2)) dB"
 else
   amixer -c "$card" cset iface=MIXER,name='Microphone Capture Volume' "$(( $1 * 2 ))" >/dev/null
