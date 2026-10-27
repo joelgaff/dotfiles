@@ -1,0 +1,13 @@
+[Unit]
+Description=Point Mic FX at the MV7+ when plugged in, the laptop mic otherwise
+After=pipewire.service wireplumber.service omarchy-mic-fx.service
+Wants=wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/mic-fx-follow
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Keep Mic FX pointed at the best microphone as devices come and go:
+# the Shure MV7+ whenever it is plugged in, the laptop's built-in mic otherwise.
+#
+# Mic FX processes one fixed source. When that source unplugs, the processed
+# source goes silent and every app that uses it hears nothing. This runs as a
+# user service (mic-fx-follow.service), re-checks on every PipeWire source
+# add/remove, and re-points Mic FX only when the right device has changed.
+#
+# Usage: mic-fx-follow        (loop; what the service runs)
+#        mic-fx-follow once   (sync now and exit)
+
+set -uo pipefail
+
+FX="$HOME/.config/omarchy/plugins/io.github.codemonkey76.micfx/omarchy-mic-fx"
+LAPTOP="alsa_input.pci-0000_c1_00.6.HiFi__Mic2__source"
+
+wanted() {
+  local mv7
+  mv7=$(pactl list sources short 2>/dev/null \
+        | awk '$2 ~ /^alsa_input\.usb-Shure_Inc_Shure_MV7/ { print $2; exit }')
+  echo "${mv7:-$LAPTOP}"
+}
+
+current() {
+  "$FX" status 2>/dev/null \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin)["device"]["name"])' 2>/dev/null
+}
+
+sync_fx() {
+  local want cur
+  want=$(wanted)
+  cur=$(current)
+  [[ "$want" == "$cur" ]] && return 0
+  pactl list sources short 2>/dev/null | grep -q "$want" || return 0
+  if "$FX" device "$want" >/dev/null 2>&1 && "$FX" on >/dev/null 2>&1; then
+    case "$want" in
+      *Shure_MV7*) notify-send -a "Mic FX" "Mic FX → Shure MV7+" ;;
+      *)           notify-send -a "Mic FX" "Mic FX → laptop mic" ;;
+    esac
+  fi
+}
+
+sync_fx
+[[ "${1:-}" == "once" ]] && exit 0
+
+pactl subscribe 2>/dev/null \
+  | grep --line-buffered -E "Event '(new|remove)' on source" \
+  | while read -r _; do
+      sleep 1
+      sync_fx
+    done
