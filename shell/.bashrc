@@ -28,3 +28,8 @@ export PATH="$HOME/bin:$PATH"
 # OpenClaw Completion
 [ -f "$HOME/.openclaw/completions/openclaw.bash" ] && source "$HOME/.openclaw/completions/openclaw.bash"
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Machine-specific settings live in ~/.config/bash/hosts/<hostname>.sh
+_host_rc="$HOME/.config/bash/hosts/$(hostname -s 2>/dev/null || uname -n).sh"
+[ -f "$_host_rc" ] && . "$_host_rc"
+unset _host_rc
