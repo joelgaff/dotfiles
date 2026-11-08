@@ -20,7 +20,7 @@ end
 hl.env("GDK_SCALE", "2")
 
 -- Fallback for any output the host file doesn't name.
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 2 })
 
 -- Workspace placement is machine-specific for the same reason: a docked machine
 -- puts 1-5 on the external and 6-10 on the internal panel, which only means

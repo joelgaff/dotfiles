@@ -49,3 +49,10 @@ o.bind("SUPER + SHIFT + I", "Screenshot and annotate (Omacapture)", "omarchy-she
 -- XF86Fn); other keyboards handle Fn internally, so this is a no-op on them.
 o.bind("XF86Fn", "Start dictation (push-to-talk, globe key)", "voxtype record start")
 o.bind("XF86Fn", "Stop dictation (push-to-talk, globe key)", "voxtype record stop", { release = true })
+
+-- Dictation keys from before Alt + Space and Right Alt became the defaults.
+-- Remove these lines to give the keys back to applications.
+if o.dictation_installed and o.dictation_installed() then
+  o.bind("SUPER + CTRL + X", "Toggle dictation", "omarchy-dictation toggle")
+  o.bind_hold("F9", "Start dictation (push-to-talk)", "omarchy-dictation start", "Stop dictation (push-to-talk)", "omarchy-dictation stop")
+end

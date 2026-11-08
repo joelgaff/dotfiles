@@ -4,6 +4,11 @@ hl.monitor({ output = "eDP-1", mode = "2880x1920@120", position = "auto-center-d
 hl.monitor({ output = "DP-4", mode = "3840x2160@60", position = "auto-center-up", scale = 1.25 }) -- port 1, far left
 hl.monitor({ output = "DP-3", mode = "3840x2160@60", position = "auto-center-up", scale = 1.25 }) -- port 2, near left
 
+-- Omarchy 4.5 gives every monitor its own block of ten workspaces
+-- (default/hypr/monitor-workspaces.lua) and the stock bar widget filters per
+-- monitor, so the hand-rolled 1-5 external / 6-10 internal layout below is
+-- retired in favour of the default. Kept for reference (2026-11-05).
+--[[
 -- Docked layout: workspaces 1-5 on the external, 6-10 on the internal panel.
 --
 -- Only DP-3 is named. The old config declared every workspace against both
@@ -29,6 +34,7 @@ end
 -- Keeps workspaces 1-5 on the external and 6-10 on the internal panel as
 -- monitors come and go. See scripts/workspace-layout-watch.sh.
 o.launch_on_start(os.getenv("HOME") .. "/.config/hypr/scripts/workspace-layout-watch.sh")
+]]
 
 -- Hides Chromium's "is sharing your screen" bar when Omarchy's map-time rule
 -- misses it. See scripts/share-bar-hide-watch.sh.

@@ -24,8 +24,7 @@
   gpgsign = true
 
 [credential "https://github.com"]
-	helper = 
-	helper = !/home/joel/.local/share/mise/installs/gh/2.101.0/gh_2.101.0_linux_amd64/bin/gh auth git-credential
+	helper = /home/joel/.local/bin/git-credential-gh-mise
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/home/joel/.local/share/mise/installs/gh/2.101.0/gh_2.101.0_linux_amd64/bin/gh auth git-credential

@@ -1,12 +1,9 @@
 {
   "bar": {
-    "centerAnchor": "sirwizardlizard.calendar",
     "layout": {
       "center": [
         {
-          "id": "omarchy.indicators"
-        },
-        {
+          "id": "sirwizardlizard.calendar",
           "calendarColors": {},
           "calendarNames": {},
           "customDayEndHour": 24,
@@ -17,28 +14,18 @@
           "defaultView": "week",
           "format": "dddd h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
-          "id": "sirwizardlizard.calendar",
           "provider": "evolution-data-server",
           "reminderMinutes": 10,
-          "showDayPanel": false,
+          "showDayPanel": true,
           "showWeekNumbers": true,
           "timeFormat": "12h",
           "verticalFormat": "HH\n—\nmm",
           "weekStartDay": 0
-        },
-        {
-          "id": "omarchy.keyboard-layout"
-        },
-        {
-          "id": "omarchy.weather"
-        },
-        {
-          "id": "omarchy.system-update"
         }
       ],
       "left": [
         {
-          "id": "joel.workspaces"
+          "id": "omarchy.workspaces"
         },
         {
           "id": "omarchy.menu"
@@ -51,6 +38,9 @@
             "TelegramDesktop"
           ],
           "id": "omarchy.tray"
+        },
+        {
+          "id": "omarchy.keyboard-layout"
         },
         {
           "id": "joelgaff.shurectl"
@@ -126,10 +116,60 @@
         {
           "id": "omarchy.power"
         }
-      ]
+      ],
+      "centerBegin": [
+        {
+          "id": "omarchy.indicators"
+        }
+      ],
+      "centerEnd": [
+        {
+          "id": "omarchy.elsewhen",
+          "cities": [
+            {
+              "name": "Los Angeles",
+              "zone": "America/Los_Angeles"
+            },
+            {
+              "name": "Azores",
+              "zone": "Atlantic/Azores",
+              "lat": 37.74058,
+              "lon": -25.67282,
+              "region": "PT",
+              "people": [
+                "Greg"
+              ]
+            },
+            {
+              "name": "New York",
+              "zone": "America/New_York"
+            },
+            {
+              "name": "Auckland",
+              "zone": "Pacific/Auckland",
+              "lat": -36.84853,
+              "lon": 174.76349,
+              "region": "NZ"
+            }
+          ]
+        },
+        {
+          "id": "io.github.tahadx.reel",
+          "webcam": "medium",
+          "webcamDevice": "/dev/video2",
+          "microphoneAudio": "on"
+        },
+        {
+          "id": "omarchy.weather"
+        },
+        {
+          "id": "omarchy.system-update"
+        }
+      ],
+      "tray": []
     },
     "position": "top",
-    "transparent": true
+    "transparent": false
   },
   "cloneSourceRestores": [
     "sirwizardlizard.calendar",
