@@ -27,3 +27,8 @@ require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
+
+-- Herdr desktop app is a terminal: tag it so universal copy/paste (SUPER + C/V)
+-- sends Ctrl+Shift+C/V. Untagged, SUPER + V sends Ctrl+V, which Herdr treats as
+-- image paste and text copied on this machine never reaches a remote pane.
+o.window("herdr-app", { tag = "+terminal" })
