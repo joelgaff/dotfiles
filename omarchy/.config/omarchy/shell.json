@@ -1,28 +1,7 @@
 {
   "bar": {
     "layout": {
-      "center": [
-        {
-          "id": "sirwizardlizard.calendar",
-          "calendarColors": {},
-          "calendarNames": {},
-          "customDayEndHour": 24,
-          "customDayStartHour": 0,
-          "customWeekEndHour": 19,
-          "customWeekStartHour": 7,
-          "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
-          "defaultView": "week",
-          "format": "dddd h:mm AP",
-          "formatAlt": "d MMMM 'W'ww yyyy",
-          "provider": "evolution-data-server",
-          "reminderMinutes": 10,
-          "showDayPanel": true,
-          "showWeekNumbers": true,
-          "timeFormat": "12h",
-          "verticalFormat": "HH\n—\nmm",
-          "weekStartDay": 0
-        }
-      ],
+      "center": [],
       "left": [
         {
           "id": "omarchy.workspaces"
@@ -38,6 +17,9 @@
             "TelegramDesktop"
           ],
           "id": "omarchy.tray"
+        },
+        {
+          "id": "jrmmhm.pocket"
         },
         {
           "id": "omarchy.keyboard-layout"
@@ -115,14 +97,19 @@
         },
         {
           "id": "omarchy.power"
-        }
-      ],
-      "centerBegin": [
+        },
         {
           "id": "omarchy.indicators"
-        }
-      ],
-      "centerEnd": [
+        },
+        {
+          "id": "io.github.tahadx.reel",
+          "webcam": "medium",
+          "webcamDevice": "/dev/video2",
+          "microphoneAudio": "on"
+        },
+        {
+          "id": "omarchy.system-update"
+        },
         {
           "id": "omarchy.elsewhen",
           "cities": [
@@ -143,29 +130,35 @@
             {
               "name": "New York",
               "zone": "America/New_York"
-            },
-            {
-              "name": "Auckland",
-              "zone": "Pacific/Auckland",
-              "lat": -36.84853,
-              "lon": 174.76349,
-              "region": "NZ"
             }
           ]
-        },
-        {
-          "id": "io.github.tahadx.reel",
-          "webcam": "medium",
-          "webcamDevice": "/dev/video2",
-          "microphoneAudio": "on"
         },
         {
           "id": "omarchy.weather"
         },
         {
-          "id": "omarchy.system-update"
+          "id": "sirwizardlizard.calendar",
+          "calendarColors": {},
+          "calendarNames": {},
+          "customDayEndHour": 24,
+          "customDayStartHour": 0,
+          "customWeekEndHour": 19,
+          "customWeekStartHour": 7,
+          "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
+          "defaultView": "week",
+          "format": "dddd h:mm AP",
+          "formatAlt": "d MMMM 'W'ww yyyy",
+          "provider": "evolution-data-server",
+          "reminderMinutes": 10,
+          "showDayPanel": true,
+          "showWeekNumbers": true,
+          "timeFormat": "12h",
+          "verticalFormat": "HH\n—\nmm",
+          "weekStartDay": 0
         }
       ],
+      "centerBegin": [],
+      "centerEnd": [],
       "tray": []
     },
     "position": "top",
