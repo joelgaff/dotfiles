@@ -102,7 +102,7 @@
           "customWeekStartHour": 7,
           "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
           "defaultView": "week",
-          "format": "ddd d MMM h:mm:ss",
+          "format": "ddd d MMM {h12}:mm:ss",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "provider": "evolution-data-server",
           "reminderMinutes": 10,
