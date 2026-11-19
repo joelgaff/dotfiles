@@ -19,7 +19,7 @@
           "id": "omarchy.tray"
         },
         {
-          "id": "jrmmhm.pocket"
+          "id": "joelgaff.plain-english"
         },
         {
           "id": "omarchy.keyboard-layout"
@@ -28,54 +28,13 @@
           "id": "joelgaff.shurectl"
         },
         {
-          "id": "jankeesvw.meeting-recorder"
-        },
-        {
           "id": "io.github.codemonkey76.micfx"
         },
         {
           "id": "io.github.thisisgm.omapods"
         },
         {
-          "id": "nixfred.blip"
-        },
-        {
-          "id": "jankeesvw.time-machine"
-        },
-        {
-          "id": "joelgaff.voicenotes"
-        },
-        {
-          "id": "io.github.ejuro.omamap"
-        },
-        {
-          "id": "joelgaff.hatchbox",
-          "sortBy": "Most recent deploy"
-        },
-        {
-          "activity": "Standing",
-          "barDisplay": "Icon",
-          "bedtime": "22:00",
-          "bedtimeLimitMg": "25",
-          "bodyWeightKg": "78",
-          "cupMode": "Today's intake",
-          "dailyLimitMg": "400",
-          "id": "io.github.sonderbydk.omacaffeine"
-        },
-        {
-          "id": "reysu.things"
-        },
-        {
           "id": "omarchy.microphone"
-        },
-        {
-          "id": "joelgaff.plain-english"
-        },
-        {
-          "id": "jankeesvw.tesla"
-        },
-        {
-          "id": "io.github.weedwhitesandwine.obsiduous"
         },
         {
           "id": "omarchy.tailscale"
@@ -93,9 +52,6 @@
           "id": "ssupt.audio-control"
         },
         {
-          "id": "omarchy.monitor"
-        },
-        {
           "id": "omarchy.power"
         },
         {
@@ -104,7 +60,7 @@
         {
           "id": "io.github.tahadx.reel",
           "webcam": "medium",
-          "webcamDevice": "/dev/video2",
+          "webcamDevice": "",
           "microphoneAudio": "on"
         },
         {
@@ -146,7 +102,7 @@
           "customWeekStartHour": 7,
           "defaultCalendarId": "50358955340e193035feff647efdaf446fd613b2",
           "defaultView": "week",
-          "format": "dddd h:mm AP",
+          "format": "ddd d MMM h:mm:ss",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "provider": "evolution-data-server",
           "reminderMinutes": 10,
@@ -158,8 +114,57 @@
         }
       ],
       "centerBegin": [],
-      "centerEnd": [],
-      "tray": []
+      "centerEnd": [
+        {
+          "id": "hawzhin.timebox"
+        }
+      ],
+      "tray": [
+        {
+          "id": "jankeesvw.meeting-recorder"
+        },
+        {
+          "id": "nixfred.blip"
+        },
+        {
+          "id": "jankeesvw.time-machine"
+        },
+        {
+          "id": "joelgaff.voicenotes"
+        },
+        {
+          "id": "io.github.ejuro.omamap"
+        },
+        {
+          "id": "joelgaff.hatchbox",
+          "sortBy": "Most recent deploy"
+        },
+        {
+          "activity": "Standing",
+          "barDisplay": "Icon",
+          "bedtime": "22:00",
+          "bedtimeLimitMg": "25",
+          "bodyWeightKg": "78",
+          "cupMode": "Today's intake",
+          "dailyLimitMg": "400",
+          "id": "io.github.sonderbydk.omacaffeine"
+        },
+        {
+          "id": "reysu.things"
+        },
+        {
+          "id": "jankeesvw.tesla"
+        },
+        {
+          "id": "io.github.weedwhitesandwine.obsiduous"
+        },
+        {
+          "id": "omarchy.monitor"
+        },
+        {
+          "id": "omarchy.dropbox"
+        }
+      ]
     },
     "position": "top",
     "transparent": false
