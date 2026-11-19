@@ -40,7 +40,7 @@ end
 
 -- Framework 13 built-in touchpad: faster pointer (range -1.0 to 1.0, default 0).
 -- Per-device so the MX Master keeps its own speed.
-hl.device({ name = "pixa3854:00-093a:0274-touchpad", sensitivity = 1.0 })
+hl.device({ name = "pixa3854:00-093a:0274-touchpad", sensitivity = 0.85 })
 
 -- MX Master 3S (Bluetooth): max pointer speed too.
 hl.device({ name = "logitech-mx-master-3s", sensitivity = 1.0 })
