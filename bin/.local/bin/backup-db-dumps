@@ -1,0 +1,61 @@
+#!/bin/bash
+# Dump this machine's Docker app databases into ~/backup-dumps, so the nightly
+# Time Machine run (restic as joel, which can't read the containers' root-owned
+# data directories and must not copy live database files anyway) backs up
+# consistent copies. Runs as Time Machine's pre_command; apps that aren't
+# running here are skipped, so it is a no-op on the laptops.
+#
+# Each dump is written to a temporary file and only replaces the previous one
+# when it succeeds, so a failure never costs the last good copy. Exits 1 if any
+# dump failed, which fails that night's backup loudly.
+#
+# Restore notes:
+#   Postgres:  gunzip -c immich-postgres.sql.gz | docker exec -i immich_postgres psql -U postgres
+#   SQLite:    copy home-hq-production.sqlite3 into the storage volume (app stopped)
+#   tarballs:  extract into the matching container path / volume
+
+set -uo pipefail
+umask 077
+
+out="${BACKUP_DUMPS_DIR:-$HOME/backup-dumps}"
+mkdir -p "$out" && chmod 700 "$out" || exit 1
+
+running="$(docker ps --format '{{.Names}}')" || { echo "FAILED: docker ps" >&2; exit 1; }
+failed=0
+
+# dump <container> <file> <shell pipeline writing the dump to stdout>
+dump() {
+  local container="$1" file="$2" pipeline="$3" tmp
+  if [ -z "$container" ] || ! grep -qxF -- "$container" <<<"$running"; then
+    echo "skip $file (${container:-container} not running)"
+    return
+  fi
+  tmp="$(mktemp "$out/.$file.tmp.XXXXXX")"
+  if timeout 50 bash -o pipefail -c "$pipeline" >"$tmp" && [ -s "$tmp" ]; then
+    mv -f "$tmp" "$out/$file"
+    echo "ok   $file ($(du -h "$out/$file" | cut -f1))"
+  else
+    rm -f "$tmp"
+    echo "FAILED $file" >&2
+    failed=1
+  fi
+}
+
+hq_web="$(grep -m1 '^home_hq_private-web-' <<<"$running")"
+
+dump immich_postgres immich-postgres.sql.gz \
+  "docker exec immich_postgres pg_dumpall -U postgres --clean --if-exists | gzip"
+dump teslamate-database-1 teslamate-postgres.sql.gz \
+  "docker exec teslamate-database-1 pg_dumpall -U teslamate --clean --if-exists | gzip"
+dump homeassistant homeassistant-storage.tar.gz \
+  "docker exec homeassistant tar -C /config -czf - .storage"
+dump teslamate-grafana-1 teslamate-grafana.tar.gz \
+  "docker cp teslamate-grafana-1:/var/lib/grafana - | gzip"
+dump teslamate-mosquitto-1 teslamate-mosquitto.tar.gz \
+  "docker exec teslamate-mosquitto-1 tar -C /mosquitto -czf - data auth"
+# SQLite's online backup gives a consistent copy of the live database; it is
+# made inside the container, then streamed out and removed.
+dump "$hq_web" home-hq-production.sqlite3 \
+  "docker exec $hq_web sh -c 'f=\$(mktemp) && sqlite3 /rails/storage/production.sqlite3 \".backup \$f\" && cat \$f; s=\$?; rm -f \$f; exit \$s'"
+
+exit "$failed"

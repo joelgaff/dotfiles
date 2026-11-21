@@ -27,6 +27,9 @@ A `post-update` hook re-links everything afterwards — see [Config Drift](#conf
 - **time-machine** - The shared Time Machine `excludes.txt` (Dropbox and the root-owned
   Docker files restic can't read). `config.json` and the `.key` stay local per machine:
   each host has its own destination and schedule, and the plugin rewrites config.json
+  Each host's config.json sets `pre_command` to `~/.local/bin/backup-db-dumps` (in **bin**),
+  which dumps the Docker apps' databases into `~/backup-dumps` before each backup and skips
+  apps that aren't running. Test: `setup/tests/backup-db-dumps.test.sh`
 - **setup** - Not stowed: `install.sh` and the package/plugin/web app lists it reads (see [Fresh Machine Setup](#fresh-machine-setup))
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
 - **wayland** - Keeps Spotify off XWayland so fractional monitor scaling stays sharp.
