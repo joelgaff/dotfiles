@@ -6,3 +6,8 @@
 -- The lock screen is drawn by the Omarchy shell, which isn't up yet when
 -- Hyprland starts, so wait for it to answer a ping (up to 30s) first.
 o.exec_on_start("bash -c 'for i in $(seq 60); do omarchy-shell shell ping >/dev/null 2>&1 && break; sleep 0.5; done; omarchy-system-lock'")
+
+-- Its display is small and low-DPI, unlike the laptops' HiDPI panels that the
+-- shared fallback in monitors.lua is tuned for.
+hl.env("GDK_SCALE", "1")
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1.25 })

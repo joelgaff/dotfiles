@@ -1,4 +1,11 @@
-#!/usr/bin/env bash
-unset PYTHONPATH
-unset PYTHONHOME
-exec "/home/joel/.hermes/hermes-agent/venv/bin/python" "/home/joel/.hermes/hermes-agent/hermes" "$@"
+#!/bin/sh
+# Hermes launcher shared by every machine. The Hermes installer rewrites this
+# file with a path for the runtime it just set up, which differs per machine:
+# the beelink (Hermes's home) runs the newer bundled runtime, while framework13
+# still has the older venv. Use whichever is installed.
+h="$HOME/.hermes/hermes-agent"
+if [ -x "$h/.hermes/bin/hermes" ]; then
+  exec "$h/.hermes/bin/hermes" "$@"
+fi
+unset PYTHONPATH PYTHONHOME
+exec "$h/venv/bin/python" "$h/hermes" "$@"
