@@ -35,6 +35,9 @@ step "Dotfiles"
 # so those aren't thrown away.)
 cd "$DOTFILES"
 dirty=$(git status --porcelain)
+# Time Machine refuses a config directory that is a symlink, so make the real
+# directory first; stow then links excludes.txt into it instead of folding.
+mkdir -p -m 700 "$HOME/.config/omarchy-time-machine"
 mapfile -t packages < <(find . -maxdepth 1 -mindepth 1 -type d \
   -not -name '.git' -not -name 'macos' -not -name 'setup' -printf '%f\n')
 # --adopt can't take over a link Omarchy made (e.g. nvim's theme.lua), and

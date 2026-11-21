@@ -1,0 +1,24 @@
+# Things Time Machine skips. One pattern per line, # for comments.
+# A pattern with a slash is matched against the whole path;
+# a bare name matches anywhere.
+
+/home/joel/Dropbox
+/home/joel/dropbox-safety-backup
+/home/joel/.dropbox
+/home/joel/.dropbox-dist
+
+# Root-owned Docker volumes restic cannot read as joel (the nightly run exits 3
+# and Time Machine reports a failed backup). Immich's Postgres data directory
+# should be backed up with pg_dump instead; the Home Assistant entries are
+# root-owned secret/registry files inside .storage.
+/home/joel/immich/postgres
+/home/joel/home-assistant/config/.storage/auth
+/home/joel/home-assistant/config/.storage/auth_provider.homeassistant
+/home/joel/home-assistant/config/.storage/core.config
+/home/joel/home-assistant/config/.storage/core.uuid
+/home/joel/home-assistant/config/.storage/http
+/home/joel/home-assistant/config/.storage/nest.event_media
+/home/joel/home-assistant/config/.storage/onboarding
+
+# icloudpd's per-account state directory (beelink only; harmless elsewhere).
+/home/joel/immich/icloudpd/joelgaheycom

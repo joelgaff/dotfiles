@@ -24,6 +24,9 @@ A `post-update` hook re-links everything afterwards — see [Config Drift](#conf
 - **omarchy** - Omarchy (Quattro) Quickshell settings — bar layout, idle timers, the
   `joel.display-off` shell plugin, and the `post-update` hook that repairs stow drift
 - **bin** - User scripts (`omarchy-export`, `omarchy-import`, `dots-save-packages`) in `~/.local/bin`
+- **time-machine** - The shared Time Machine `excludes.txt` (Dropbox and the root-owned
+  Docker files restic can't read). `config.json` and the `.key` stay local per machine:
+  each host has its own destination and schedule, and the plugin rewrites config.json
 - **setup** - Not stowed: `install.sh` and the package/plugin/web app lists it reads (see [Fresh Machine Setup](#fresh-machine-setup))
 - **qmd** - [QMD](https://github.com/nickarrow/qmd) local markdown search — systemd timer for daily re-indexing
 - **wayland** - Keeps Spotify off XWayland so fractional monitor scaling stays sharp.
